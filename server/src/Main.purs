@@ -1,6 +1,6 @@
 module Main where
 
-import Node.HTTP (HTTP, ListenOptions, Request, Response, createServer, listen, requestMethod, responseAsStream, setStatusCode, setStatusMessage)
+import Node.HTTP as H
 import Node.Stream (end)
 
 import Control.Applicative (pure)
@@ -13,28 +13,28 @@ import Data.Unit (Unit, unit)
 
 import Prelude
 
-listenOptions :: ListenOptions
+listenOptions :: H.ListenOptions
 listenOptions = {
   hostname: "localhost",
   port: 9700,
   backlog: Nothing
 }
 
-listenCallback :: Eff (http :: HTTP, console :: CONSOLE) Unit
-listenCallback = log "Server listening on port 9700."
+listenCallback :: Eff (http :: H.HTTP, console :: CONSOLE) Unit
+listenCallback = log "HTTP server listening on port 9700."
 
-respond :: forall eff. Request -> Response -> Eff (http :: HTTP, console :: CONSOLE | eff) Unit
+respond :: forall eff. H.Request -> H.Response -> Eff (http :: H.HTTP, console :: CONSOLE | eff) Unit
 respond request response = do
-  let method = requestMethod request
-      responseStream = responseAsStream response
+  let method = H.requestMethod request
+      responseStream = H.responseAsStream response
   log ("Request with method: " <> method)
-  setStatusCode response 200
-  setStatusMessage response "OK"
+  H.setStatusCode response 200
+  H.setStatusMessage response "OK"
   end responseStream (pure unit)
 
-main :: Eff (console :: CONSOLE, http :: HTTP) Unit
+main :: Eff (console :: CONSOLE, http :: H.HTTP) Unit
 main = do
   log "Before creating server"
-  server <- createServer respond
-  listen server listenOptions listenCallback
+  server <- H.createServer respond
+  H.listen server listenOptions listenCallback
   log "Hello cockboys!"
