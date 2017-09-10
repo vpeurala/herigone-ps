@@ -1,7 +1,8 @@
 module Main where
 
+import Node.Encoding (Encoding(UTF8))
 import Node.HTTP as H
-import Node.Stream (end)
+import Node.Stream as S
 
 import Control.Applicative (pure)
 import Control.Bind (bind, discard)
@@ -30,7 +31,8 @@ respond request response = do
   log ("Request with method: " <> method)
   H.setStatusCode response 200
   H.setStatusMessage response "OK"
-  end responseStream (pure unit)
+  _ <- S.writeString responseStream UTF8 "Sook kook\n" (pure unit)
+  S.end responseStream (pure unit)
 
 main :: Eff (console :: CONSOLE, http :: H.HTTP) Unit
 main = do
