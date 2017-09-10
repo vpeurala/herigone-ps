@@ -1,8 +1,11 @@
 module Main where
 
-import Node.HTTP
+import Node.HTTP (Server(), createServer)
 
+import Control.Bind (bind)
 import Control.Monad.Eff.Console
 
-main = log "Hello cockboys!"
+main = do
+  server <- createServer
+  log "Hello cockboys!"
 
