@@ -1,0 +1,22 @@
+{
+  "name": "herigone-ps-server",
+  "homepage": "https://github.com/vpeurala/herigone-ps",
+  "authors": [
+    "Ville Peurala <ville.peurala@gmail.com>"
+  ],
+  "description": "herigone-ps-server",
+  "main": "main.js",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "purescript-express": "^0.5.2",
+    "purescript-node-process": "^5.0.0"
+  }
+}
