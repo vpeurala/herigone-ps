@@ -27,6 +27,7 @@ listenCallback = log "HTTP server listening on port 9700."
 respondToGET :: forall eff. H.Request -> H.Response -> Eff (http :: H.HTTP, console :: CONSOLE | eff) Unit
 respondToGET request response = do
   let responseStream = H.responseAsStream response
+      url            = H.requestURL request
   H.setStatusCode response 200
   H.setStatusMessage response "OK"
   H.setHeader response "Connection" "close"
