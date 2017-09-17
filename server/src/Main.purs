@@ -34,14 +34,14 @@ respondToGET request response = do
 
 respondToPOST :: forall eff. H.Request -> H.Response -> Eff (http :: H.HTTP, console :: CONSOLE | eff) Unit
 respondToPOST request response = do
-  let responseStream = H.responseAsStream response
-  H.setStatusCode response 405
-  S.end responseStream (pure unit)
+  respondToUnsupportedMethod request response
 
 respondToUnsupportedMethod :: forall eff. H.Request -> H.Response -> Eff (http :: H.HTTP, console :: CONSOLE | eff) Unit
 respondToUnsupportedMethod request response = do
   let responseStream = H.responseAsStream response
   H.setStatusCode response 405
+  H.setStatusMessage response "Method Not Allowed"
+  H.setHeader response "Connection" "close"
   S.end responseStream (pure unit)
 
 respond :: forall eff. H.Request -> H.Response -> Eff (http :: H.HTTP, console :: CONSOLE | eff) Unit
