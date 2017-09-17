@@ -1,4 +1,4 @@
-Use Node.js v8.4.0 via NVM
+Use Node.js v8.5.0 via NVM
 
 npm install -g bower pulp purescript
 cd server
