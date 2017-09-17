@@ -29,7 +29,9 @@ respondToGET request response = do
   let responseStream = H.responseAsStream response
   H.setStatusCode response 200
   H.setStatusMessage response "OK"
-  _ <- S.writeString responseStream UTF8 "Sook kook\n" (pure unit)
+  H.setHeader response "Connection" "close"
+  H.setHeader response "Transfer-Encoding" "identity"
+  _ <- S.writeString responseStream UTF8 "Sook kook and die\n" (pure unit)
   S.end responseStream (pure unit)
 
 respondToPOST :: forall eff. H.Request -> H.Response -> Eff (http :: H.HTTP, console :: CONSOLE | eff) Unit
