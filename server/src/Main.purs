@@ -49,7 +49,8 @@ respondToUnsupportedMethod request response = do
 respond :: forall eff. H.Request -> H.Response -> Eff (http :: H.HTTP, console :: CONSOLE | eff) Unit
 respond request response = do
   let method = H.requestMethod request
-  log ("Request with method: " <> method)
+      url    = H.requestURL request
+  log ("Request with method: '" <> method <> "' to URL: '" <> url <> "'.")
   case method of
     "GET"  -> respondToGET request response
     "POST" -> respondToPOST request response
