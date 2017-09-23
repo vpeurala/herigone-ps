@@ -42,8 +42,11 @@ getListenOptions = do
     backlog: M.Nothing
   }
 
-listenCallback :: forall eff. Eff (http :: H.HTTP, console :: CONSOLE | eff) Unit
-listenCallback = log "HTTP server listening on port 9700."
+listenCallback :: forall eff. Eff (console :: CONSOLE, http :: H.HTTP, process :: PROCESS | eff) Unit
+listenCallback = do
+  listeningPort <- getPort
+  log ("HTTP server listening on port " <> (show listeningPort) <> ".")
+  pure unit
 
 respondToGET :: forall eff. H.Request -> H.Response -> Eff (http :: H.HTTP, console :: CONSOLE | eff) Unit
 respondToGET request response = do
@@ -80,8 +83,6 @@ respond request response = do
 
 main :: forall eff. Eff (console :: CONSOLE, http :: H.HTTP, process :: PROCESS | eff) Unit
 main = do
-  log "Before creating server"
   server <- H.createServer respond
   listenOptions <- getListenOptions
   H.listen server listenOptions listenCallback
-  log "Hello cockboys!"
