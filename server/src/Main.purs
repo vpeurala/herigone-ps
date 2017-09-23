@@ -3,22 +3,46 @@ module Main where
 import Node.Encoding (Encoding(UTF8))
 import Node.HTTP as H
 import Node.Stream as S
+import Node.Process (PROCESS, lookupEnv)
 
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 
-import Data.Maybe (Maybe(..))
+import Data.Int as Int
+import Data.Maybe as M
 
 import Prelude
 
-listenOptions :: H.ListenOptions
-listenOptions = {
-  hostname: "0.0.0.0",
-  port: 9700,
-  backlog: Nothing
-}
+defaultPort :: Int
+defaultPort = 9771
 
-listenCallback :: Eff (http :: H.HTTP, console :: CONSOLE) Unit
+getPort :: forall eff. Eff (process :: PROCESS, console :: CONSOLE | eff) Int
+getPort = do
+  environmentVariable <- lookupEnv "HERIGONE_SERVER_PORT"
+  case environmentVariable of
+    M.Nothing -> do
+      log ("Environment variable HERIGONE_SERVER_PORT not set.")
+      pure defaultPort
+    M.Just environmentVariableValue -> do
+      let parsedPort = Int.fromString environmentVariableValue
+      case parsedPort of
+        M.Nothing -> do
+          log ("Environment variable HERIGONE_SERVER_PORT set to a value of \"" <> environmentVariableValue <> "\" which could not be parsed as an integer.")
+          pure defaultPort
+        M.Just portNumber -> do
+          log ("Environment variable HERIGONE_SERVER_PORT set to a value of " <> (show portNumber) <> ".")
+          pure portNumber
+
+getListenOptions :: forall eff. Eff (process :: PROCESS, console :: CONSOLE | eff) H.ListenOptions
+getListenOptions = do
+  listeningPort <- getPort
+  pure {
+    hostname: "0.0.0.0",
+    port: listeningPort,
+    backlog: M.Nothing
+  }
+
+listenCallback :: forall eff. Eff (http :: H.HTTP, console :: CONSOLE | eff) Unit
 listenCallback = log "HTTP server listening on port 9700."
 
 respondToGET :: forall eff. H.Request -> H.Response -> Eff (http :: H.HTTP, console :: CONSOLE | eff) Unit
@@ -54,9 +78,10 @@ respond request response = do
     "POST" -> respondToPOST request response
     _      -> respondToUnsupportedMethod request response
 
-main :: Eff (console :: CONSOLE, http :: H.HTTP) Unit
+main :: forall eff. Eff (console :: CONSOLE, http :: H.HTTP, process :: PROCESS | eff) Unit
 main = do
   log "Before creating server"
   server <- H.createServer respond
+  listenOptions <- getListenOptions
   H.listen server listenOptions listenCallback
   log "Hello cockboys!"
