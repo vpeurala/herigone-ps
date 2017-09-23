@@ -4,13 +4,10 @@ import Node.Encoding (Encoding(UTF8))
 import Node.HTTP as H
 import Node.Stream as S
 
-import Control.Applicative (pure)
-import Control.Bind (bind, discard)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 
 import Data.Maybe (Maybe(..))
-import Data.Unit (Unit, unit)
 
 import Prelude
 
