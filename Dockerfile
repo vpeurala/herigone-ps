@@ -3,6 +3,7 @@ FROM ubuntu:16.04
 USER root
 
 ENV TERM linux
+ENV PATH=$PATH:/home/node/.npm-global/bin
 
 ADD server herigone-ps-server
 
@@ -14,14 +15,16 @@ RUN bash nodesource_setup.sh
 RUN apt-get install -y nodejs
 RUN addgroup --gid 1000 node
 RUN adduser -u 1000 --ingroup node --disabled-password --shell /bin/sh node
-RUN chown -R node:node /usr/lib/node_modules
+RUN chown -R node:node /herigone-ps-server
 
-WORKDIR herigone-ps-server
 USER node
+WORKDIR herigone-ps-server
 
-# RUN npm install -g purescript pulp bower
+RUN npm config set prefix '~/.npm-global'
 
-# CMD ["bower", "--allow-root", "install"]
-# CMD ["pulp", "run"]
+RUN npm install -g purescript pulp bower
+RUN bower install
 
-# EXPOSE 9700
+EXPOSE 9700
+
+CMD ["pulp", "run"]
