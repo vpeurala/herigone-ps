@@ -33,19 +33,16 @@ getPort = do
           log ("Environment variable HERIGONE_SERVER_PORT set to a value of " <> (show portNumber) <> ".")
           pure portNumber
 
-getListenOptions :: forall eff. Eff (process :: PROCESS, console :: CONSOLE | eff) H.ListenOptions
-getListenOptions = do
-  listeningPort <- getPort
-  pure {
+getListenOptions :: Int -> H.ListenOptions
+getListenOptions listeningPort = {
     hostname: "0.0.0.0",
     port: listeningPort,
     backlog: M.Nothing
   }
 
-listenCallback :: forall eff. Eff (console :: CONSOLE, http :: H.HTTP, process :: PROCESS | eff) Unit
-listenCallback = do
-  listeningPort <- getPort
-  log ("HTTP server listening on port " <> (show listeningPort) <> ".")
+listenCallback :: forall eff. Int -> Eff (console :: CONSOLE, http :: H.HTTP, process :: PROCESS | eff) Unit
+listenCallback port = do
+  log ("HTTP server listening on port " <> (show port) <> ".")
   pure unit
 
 respondToGET :: forall eff. H.Request -> H.Response -> Eff (http :: H.HTTP, console :: CONSOLE | eff) Unit
@@ -83,6 +80,7 @@ respond request response = do
 
 main :: forall eff. Eff (console :: CONSOLE, http :: H.HTTP, process :: PROCESS | eff) Unit
 main = do
+  port <- getPort
   server <- H.createServer respond
-  listenOptions <- getListenOptions
-  H.listen server listenOptions listenCallback
+  H.listen server (getListenOptions port) (listenCallback port)
+  pure unit
