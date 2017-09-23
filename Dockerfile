@@ -12,11 +12,16 @@ RUN apt-get install -y curl
 RUN curl -sL https://raw.githubusercontent.com/nodesource/distributions/master/deb/setup_8.x -o nodesource_setup.sh
 RUN bash nodesource_setup.sh
 RUN apt-get install -y nodejs
-RUN npm install -g purescript pulp bower
+RUN addgroup --gid 1000 node
+RUN adduser -u 1000 --ingroup node --disabled-password --shell /bin/sh node
+RUN chown -R node:node /usr/lib/node_modules
 
 WORKDIR herigone-ps-server
+USER node
 
-CMD ["bower", "--allow-root", "install"]
+# RUN npm install -g purescript pulp bower
+
+# CMD ["bower", "--allow-root", "install"]
 # CMD ["pulp", "run"]
 
-EXPOSE 9700
+# EXPOSE 9700
