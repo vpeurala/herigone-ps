@@ -16,7 +16,7 @@ import Prelude
 
 listenOptions :: H.ListenOptions
 listenOptions = {
-  hostname: "localhost",
+  hostname: "0.0.0.0",
   port: 9700,
   backlog: Nothing
 }
