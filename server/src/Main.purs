@@ -7,15 +7,15 @@ import Node.Process (PROCESS, lookupEnv)
 
 import Database.Postgres as PG
 
-import Control.Monad.Aff (makeAff)
+import Control.Monad.Aff (Aff)
 import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Class
+import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 
 import Data.Int as Int
 import Data.Maybe as M
 
-import Prelude
+import Prelude (Unit, bind, discard, pure, show, unit, ($), (<>))
 
 databaseConnectionInfo :: PG.ConnectionInfo
 databaseConnectionInfo = {
@@ -91,9 +91,10 @@ respond request response = do
     "POST" -> respondToPOST request response
     _      -> respondToUnsupportedMethod request response
 
+main :: forall aff. Aff ( db :: PG.DB, console :: CONSOLE, process :: PROCESS, http :: H.HTTP | aff) Unit
 main = do
-  -- dbClient <- PG.connect databaseConnectionInfo
+  dbClient <- PG.connect databaseConnectionInfo
   port <- liftEff getPort
-  server <- H.createServer respond
-  H.listen server (getListenOptions port) (listenCallback port)
+  server <- liftEff $ H.createServer respond
+  liftEff $ H.listen server (getListenOptions port) (listenCallback port)
   pure unit
