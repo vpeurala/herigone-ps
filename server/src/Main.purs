@@ -7,10 +7,11 @@ import Node.Process (PROCESS, lookupEnv)
 
 import Database.Postgres as PG
 
-import Control.Monad.Aff (Aff, launchAff_)
+import Control.Monad.Aff (Aff, launchAff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (CONSOLE, log)
+import Control.Monad.Eff.Exception (EXCEPTION)
 
 import Data.Int as Int
 import Data.Maybe as M
@@ -99,5 +100,7 @@ asyncMain = do
   liftEff $ H.listen server (getListenOptions port) (listenCallback port)
   pure unit
 
+main :: forall eff. Eff ( db :: PG.DB, exception :: EXCEPTION, console :: CONSOLE, process :: PROCESS, http :: H.HTTP | eff) Unit
 main = do
-  launchAff_ asyncMain
+  canceler <- launchAff asyncMain
+  pure unit
