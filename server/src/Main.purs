@@ -7,16 +7,38 @@ import Node.Process (PROCESS, lookupEnv)
 
 import Database.Postgres as PG
 
-import Control.Monad.Aff (Aff, launchAff)
+import Control.Monad.Aff (Aff, launchAff, runAff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 import Control.Monad.Eff.Exception (EXCEPTION)
 
+import Data.Foreign (F, Foreign)
+import Data.Foreign.Class (class Decode)
+import Data.Foreign.Generic (defaultOptions, genericDecode)
+import Data.Generic.Rep (class Generic)
 import Data.Int as Int
 import Data.Maybe as M
 
-import Prelude (Unit, bind, discard, pure, show, unit, ($), (<>))
+import Prelude (Unit, bind, const, discard, map, pure, show, unit, ($), (<>))
+
+newtype Association = Association {
+  id :: Int,
+  number :: String,
+  word :: String
+}
+
+derive instance associationGeneric :: Generic Association _
+instance associationDecode :: Decode Association where decode = decodeAssociation
+
+decodeAssociation :: Foreign -> F Association
+decodeAssociation f = genericDecode defaultOptions f
+
+selectAllAssociations :: PG.Query Association
+selectAllAssociations = PG.Query "SELECT * FROM association"
+
+querySelectAllAssociations :: forall aff. PG.Client -> Aff (db :: PG.DB | aff) (Array Association)
+querySelectAllAssociations dbClient = PG.query selectAllAssociations [] dbClient
 
 databaseConnectionInfo :: PG.ConnectionInfo
 databaseConnectionInfo = {
@@ -59,46 +81,45 @@ listenCallback port = do
   log ("HTTP server listening on port " <> (show port) <> ".")
   pure unit
 
-respondToGET :: forall eff. PG.Client -> H.Request -> H.Response -> Eff (http :: H.HTTP, console :: CONSOLE | eff) Unit
+respondToGET :: forall aff. PG.Client -> H.Request -> H.Response -> Aff (db :: PG.DB, http :: H.HTTP, console :: CONSOLE | aff) Unit
 respondToGET dbClient request response = do
   let responseStream = H.responseAsStream response
       url            = H.requestURL request
-  H.setStatusCode response 200
-  H.setStatusMessage response "OK"
-  H.setHeader response "Connection" "close"
-  H.setHeader response "Transfer-Encoding" "identity"
-  let query = PG.Query "SELECT * FROM association"
-  queryResult <- PG.query query [] dbClient
-  _ <- S.writeString responseStream UTF8 "Sook kook and die\n" (pure unit)
-  S.end responseStream (pure unit)
+  liftEff $ H.setStatusCode response 200
+  liftEff $ H.setStatusMessage response "OK"
+  liftEff $ H.setHeader response "Connection" "close"
+  liftEff $ H.setHeader response "Transfer-Encoding" "identity"
+  -- queryResult <- querySelectAllAssociations dbClient
+  _ <- liftEff $ S.writeString responseStream UTF8 "Sook kook and die\n" (pure unit)
+  liftEff $ S.end responseStream (pure unit)
 
-respondToPOST :: forall eff. H.Request -> H.Response -> Eff (http :: H.HTTP, console :: CONSOLE | eff) Unit
-respondToPOST request response = do
-  respondToUnsupportedMethod request response
-
-respondToUnsupportedMethod :: forall eff. H.Request -> H.Response -> Eff (http :: H.HTTP, console :: CONSOLE | eff) Unit
+respondToUnsupportedMethod :: forall aff. H.Request -> H.Response -> Aff (http :: H.HTTP, console :: CONSOLE | aff) Unit
 respondToUnsupportedMethod request response = do
   let responseStream = H.responseAsStream response
-  H.setStatusCode response 405
-  H.setStatusMessage response "Method Not Allowed"
-  H.setHeader response "Connection" "close"
-  S.end responseStream (pure unit)
+  liftEff $ H.setStatusCode response 405
+  liftEff $ H.setStatusMessage response "Method Not Allowed"
+  liftEff $ H.setHeader response "Connection" "close"
+  liftEff $ S.end responseStream (pure unit)
 
-respond :: forall eff. PG.Client -> H.Request -> H.Response -> Eff (http :: H.HTTP, console :: CONSOLE | eff) Unit
+respond :: forall aff. PG.Client -> H.Request -> H.Response -> Aff (db :: PG.DB, http :: H.HTTP, console :: CONSOLE | aff) Unit
 respond dbClient request response = do
   let method = H.requestMethod request
       url    = H.requestURL request
-  log ("Request with method: '" <> method <> "' to URL: '" <> url <> "'.")
+  liftEff $ log ("Request with method: '" <> method <> "' to URL: '" <> url <> "'.")
   case method of
     "GET"  -> respondToGET dbClient request response
-    "POST" -> respondToPOST request response
     _      -> respondToUnsupportedMethod request response
+
+createServerFunction :: forall eff. PG.Client -> H.Request -> H.Response -> Eff (db :: PG.DB, http :: H.HTTP, console :: CONSOLE | eff) Unit
+createServerFunction dbClient request response =
+  let canceler = runAff (\err -> pure unit) (\succ -> pure unit) (respond dbClient request response)
+  in  map (const unit) canceler
 
 asyncMain :: forall aff. Aff ( db :: PG.DB, console :: CONSOLE, process :: PROCESS, http :: H.HTTP | aff) Unit
 asyncMain = do
   dbClient <- PG.connect databaseConnectionInfo
   port <- liftEff getPort
-  server <- liftEff $ H.createServer (respond dbClient)
+  server <- liftEff $ H.createServer (createServerFunction dbClient)
   liftEff $ H.listen server (getListenOptions port) (listenCallback port)
   pure unit
 
