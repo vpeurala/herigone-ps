@@ -59,14 +59,16 @@ listenCallback port = do
   log ("HTTP server listening on port " <> (show port) <> ".")
   pure unit
 
-respondToGET :: forall eff. H.Request -> H.Response -> Eff (http :: H.HTTP, console :: CONSOLE | eff) Unit
-respondToGET request response = do
+respondToGET :: forall eff. PG.Client -> H.Request -> H.Response -> Eff (http :: H.HTTP, console :: CONSOLE | eff) Unit
+respondToGET dbClient request response = do
   let responseStream = H.responseAsStream response
       url            = H.requestURL request
   H.setStatusCode response 200
   H.setStatusMessage response "OK"
   H.setHeader response "Connection" "close"
   H.setHeader response "Transfer-Encoding" "identity"
+  let query = PG.Query "SELECT * FROM association"
+  queryResult <- PG.query query [] dbClient
   _ <- S.writeString responseStream UTF8 "Sook kook and die\n" (pure unit)
   S.end responseStream (pure unit)
 
@@ -82,13 +84,13 @@ respondToUnsupportedMethod request response = do
   H.setHeader response "Connection" "close"
   S.end responseStream (pure unit)
 
-respond :: forall eff. H.Request -> H.Response -> Eff (http :: H.HTTP, console :: CONSOLE | eff) Unit
-respond request response = do
+respond :: forall eff. PG.Client -> H.Request -> H.Response -> Eff (http :: H.HTTP, console :: CONSOLE | eff) Unit
+respond dbClient request response = do
   let method = H.requestMethod request
       url    = H.requestURL request
   log ("Request with method: '" <> method <> "' to URL: '" <> url <> "'.")
   case method of
-    "GET"  -> respondToGET request response
+    "GET"  -> respondToGET dbClient request response
     "POST" -> respondToPOST request response
     _      -> respondToUnsupportedMethod request response
 
@@ -96,7 +98,7 @@ asyncMain :: forall aff. Aff ( db :: PG.DB, console :: CONSOLE, process :: PROCE
 asyncMain = do
   dbClient <- PG.connect databaseConnectionInfo
   port <- liftEff getPort
-  server <- liftEff $ H.createServer respond
+  server <- liftEff $ H.createServer (respond dbClient)
   liftEff $ H.listen server (getListenOptions port) (listenCallback port)
   pure unit
 
