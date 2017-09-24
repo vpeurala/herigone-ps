@@ -5,6 +5,9 @@ import Node.HTTP as H
 import Node.Stream as S
 import Node.Process (PROCESS, lookupEnv)
 
+import Database.Postgres as PG
+
+import Control.Monad.Aff (makeAff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 
@@ -12,6 +15,15 @@ import Data.Int as Int
 import Data.Maybe as M
 
 import Prelude
+
+databaseConnectionInfo :: PG.ConnectionInfo
+databaseConnectionInfo = {
+  host: "0.0.0.0",
+  port: 5432,
+  db: "herigone",
+  user: "herigone",
+  password: "herigone"
+}
 
 defaultPort :: Int
 defaultPort = 9771
@@ -78,9 +90,9 @@ respond request response = do
     "POST" -> respondToPOST request response
     _      -> respondToUnsupportedMethod request response
 
-main :: forall eff. Eff (console :: CONSOLE, http :: H.HTTP, process :: PROCESS | eff) Unit
 main = do
-  port <- getPort
+  dbClient <- PG.connect databaseConnectionInfo
+  port <- makeAff getPort
   server <- H.createServer respond
   H.listen server (getListenOptions port) (listenCallback port)
   pure unit
