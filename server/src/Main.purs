@@ -9,6 +9,7 @@ import Database.Postgres as PG
 
 import Control.Monad.Aff (makeAff)
 import Control.Monad.Eff (Eff)
+import Control.Monad.Eff.Class
 import Control.Monad.Eff.Console (CONSOLE, log)
 
 import Data.Int as Int
@@ -91,8 +92,8 @@ respond request response = do
     _      -> respondToUnsupportedMethod request response
 
 main = do
-  dbClient <- PG.connect databaseConnectionInfo
-  port <- makeAff getPort
+  -- dbClient <- PG.connect databaseConnectionInfo
+  port <- liftEff getPort
   server <- H.createServer respond
   H.listen server (getListenOptions port) (listenCallback port)
   pure unit
