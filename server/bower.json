@@ -27,6 +27,10 @@
     "purescript-node-buffer": "^3.0.1",
     "purescript-node-process": "^5.0.0",
     "purescript-integers": "^3.1.0",
-    "purescript-node-postgres": "^3.0.0"
+    "purescript-node-postgres": "^3.0.0",
+    "purescript-aff": "^4.0.0"
+  },
+  "resolutions": {
+    "purescript-aff": "^3.0.0"
   }
 }

@@ -7,7 +7,7 @@ import Node.Process (PROCESS, lookupEnv)
 
 import Database.Postgres as PG
 
-import Control.Monad.Aff (Aff)
+import Control.Monad.Aff (Aff, launchAff_)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (CONSOLE, log)
@@ -91,10 +91,13 @@ respond request response = do
     "POST" -> respondToPOST request response
     _      -> respondToUnsupportedMethod request response
 
-main :: forall aff. Aff ( db :: PG.DB, console :: CONSOLE, process :: PROCESS, http :: H.HTTP | aff) Unit
-main = do
+asyncMain :: forall aff. Aff ( db :: PG.DB, console :: CONSOLE, process :: PROCESS, http :: H.HTTP | aff) Unit
+asyncMain = do
   dbClient <- PG.connect databaseConnectionInfo
   port <- liftEff getPort
   server <- liftEff $ H.createServer respond
   liftEff $ H.listen server (getListenOptions port) (listenCallback port)
   pure unit
+
+main = do
+  launchAff_ asyncMain
