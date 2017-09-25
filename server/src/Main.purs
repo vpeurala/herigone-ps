@@ -11,7 +11,7 @@ import Control.Monad.Aff (Aff, launchAff, runAff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (CONSOLE, log)
-import Control.Monad.Eff.Exception (EXCEPTION)
+import Control.Monad.Eff.Exception (EXCEPTION, Error)
 
 import Data.Foreign (F, Foreign)
 import Data.Foreign.Class (class Decode)
@@ -85,13 +85,16 @@ listenCallback port = do
 
 respondToGET :: forall aff. PG.Client -> H.Request -> H.Response -> Aff (db :: PG.DB, http :: H.HTTP, console :: CONSOLE | aff) Unit
 respondToGET dbClient request response = do
+  liftEff $ log "Responding to GET"
   let responseStream = H.responseAsStream response
       url            = H.requestURL request
   liftEff $ H.setStatusCode response 200
   liftEff $ H.setStatusMessage response "OK"
   liftEff $ H.setHeader response "Connection" "close"
   liftEff $ H.setHeader response "Transfer-Encoding" "identity"
+  liftEff $ log "Before DB query"
   queryResult <- querySelectAllAssociations dbClient
+  liftEff $ log "After DB query"
   _ <- liftEff $ S.writeString responseStream UTF8 (show queryResult) (pure unit)
   liftEff $ S.end responseStream (pure unit)
 
@@ -112,9 +115,17 @@ respond dbClient request response = do
     "GET"  -> respondToGET dbClient request response
     _      -> respondToUnsupportedMethod request response
 
+handleRespondError :: forall eff. Error -> Eff (console :: CONSOLE | eff) Unit
+handleRespondError err =
+  log ("Error: " <> show err)
+
+handleRespondSuccess :: forall a eff. a -> Eff (console :: CONSOLE | eff) Unit
+handleRespondSuccess succ =
+  log ("Success!")
+
 createServerFunction :: forall eff. PG.Client -> H.Request -> H.Response -> Eff (db :: PG.DB, http :: H.HTTP, console :: CONSOLE | eff) Unit
 createServerFunction dbClient request response =
-  let canceler = runAff (\err -> pure unit) (\succ -> pure unit) (respond dbClient request response)
+  let canceler = runAff handleRespondError handleRespondSuccess (respond dbClient request response)
   in  map (const unit) canceler
 
 asyncMain :: forall aff. Aff ( db :: PG.DB, console :: CONSOLE, process :: PROCESS, http :: H.HTTP | aff) Unit
