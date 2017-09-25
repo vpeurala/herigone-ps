@@ -16,6 +16,8 @@ import Control.Monad.Eff.Exception (EXCEPTION, Error)
 import Data.Foreign (F, Foreign)
 import Data.Foreign.Class (class Decode)
 import Data.Foreign.Generic (defaultOptions, genericDecode)
+import Data.Foreign.Generic.Class (class GenericDecode)
+import Data.Foreign.Generic.Types (Options)
 import Data.Generic.Rep (class Generic)
 import Data.Int as Int
 import Data.Maybe as M
@@ -30,11 +32,13 @@ newtype Association = Association {
 }
 
 derive instance associationGeneric :: Generic Association _
-instance associationDecode :: Decode Association where decode = decodeAssociation
 instance associationShow :: Show Association where show (Association a) = "Association { id = " <> (show a.id) <> ", number = " <> a.number <> ", word = " <> a.word <> " }"
-
-decodeAssociation :: Foreign -> F Association
-decodeAssociation f = genericDecode defaultOptions f
+instance associationGenericDecode :: GenericDecode Association where
+  decodeOpts :: Options -> Foreign -> F Association
+  decodeOpts opts fgn = genericDecode defaultOptions fgn
+instance associationEncode :: Decode Association where
+  decode :: Foreign -> F Association
+  decode fgn = genericDecode defaultOptions fgn
 
 selectAllAssociations :: PG.Query Association
 selectAllAssociations = PG.Query "SELECT * FROM association"
