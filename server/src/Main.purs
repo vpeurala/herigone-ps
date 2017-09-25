@@ -19,7 +19,7 @@ import Data.Foreign.Generic (defaultOptions, genericDecode)
 import Data.Foreign.Generic.Class (class GenericDecode)
 import Data.Foreign.Generic.Types (Options)
 import Data.Foreign.Index (readProp)
-import Data.Generic.Rep (class Generic)
+import Data.Generic (class Generic)
 import Data.Int as Int
 import Data.Maybe as M
 import Data.Show (class Show)
@@ -27,17 +27,19 @@ import Data.Show (class Show)
 import Prelude (Unit, bind, const, discard, map, pure, show, unit, ($), (<>), (=<<))
 
 newtype Association = Association {
-  id :: Int,
+  id :: String,
   number :: String,
   word :: String
 }
 
-derive instance associationGeneric :: Generic Association _
+derive instance associationGeneric :: Generic Association
 instance associationShow :: Show Association where show (Association a) = "Association { id = " <> (show a.id) <> ", number = " <> a.number <> ", word = " <> a.word <> " }"
+{--
 instance associationGenericDecode :: GenericDecode Association where
   decodeOpts :: Options -> Foreign -> F Association
   decodeOpts opts fgn =
     genericDecode defaultOptions fgn
+--}
 instance associationDecode :: Decode Association where
   decode obj = do
     i <- decode =<< readProp "id" obj
@@ -50,7 +52,7 @@ instance associationDecode :: Decode Association where
     }
 
 selectAllAssociations :: PG.Query Association
-selectAllAssociations = PG.Query "SELECT * FROM association"
+selectAllAssociations = PG.Query "SELECT id, number, word FROM association"
 
 querySelectAllAssociations :: forall aff. PG.Client -> Aff (db :: PG.DB | aff) (Array Association)
 querySelectAllAssociations dbClient = PG.query selectAllAssociations [] dbClient
