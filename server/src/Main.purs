@@ -19,6 +19,7 @@ import Data.Foreign.Generic (defaultOptions, genericDecode)
 import Data.Generic.Rep (class Generic)
 import Data.Int as Int
 import Data.Maybe as M
+import Data.Show (class Show)
 
 import Prelude (Unit, bind, const, discard, map, pure, show, unit, ($), (<>))
 
@@ -30,6 +31,7 @@ newtype Association = Association {
 
 derive instance associationGeneric :: Generic Association _
 instance associationDecode :: Decode Association where decode = decodeAssociation
+instance associationShow :: Show Association where show (Association a) = "Association { id = " <> (show a.id) <> ", number = " <> a.number <> ", word = " <> a.word <> " }"
 
 decodeAssociation :: Foreign -> F Association
 decodeAssociation f = genericDecode defaultOptions f
@@ -89,8 +91,8 @@ respondToGET dbClient request response = do
   liftEff $ H.setStatusMessage response "OK"
   liftEff $ H.setHeader response "Connection" "close"
   liftEff $ H.setHeader response "Transfer-Encoding" "identity"
-  -- queryResult <- querySelectAllAssociations dbClient
-  _ <- liftEff $ S.writeString responseStream UTF8 "Sook kook and die\n" (pure unit)
+  queryResult <- querySelectAllAssociations dbClient
+  _ <- liftEff $ S.writeString responseStream UTF8 (show queryResult) (pure unit)
   liftEff $ S.end responseStream (pure unit)
 
 respondToUnsupportedMethod :: forall aff. H.Request -> H.Response -> Aff (http :: H.HTTP, console :: CONSOLE | aff) Unit
