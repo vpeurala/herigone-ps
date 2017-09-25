@@ -35,10 +35,12 @@ derive instance associationGeneric :: Generic Association _
 instance associationShow :: Show Association where show (Association a) = "Association { id = " <> (show a.id) <> ", number = " <> a.number <> ", word = " <> a.word <> " }"
 instance associationGenericDecode :: GenericDecode Association where
   decodeOpts :: Options -> Foreign -> F Association
-  decodeOpts opts fgn = genericDecode defaultOptions fgn
-instance associationEncode :: Decode Association where
+  decodeOpts opts fgn =
+    genericDecode defaultOptions fgn
+instance associationDecode :: Decode Association where
   decode :: Foreign -> F Association
-  decode fgn = genericDecode defaultOptions fgn
+  decode fgn = do
+    genericDecode defaultOptions fgn
 
 selectAllAssociations :: PG.Query Association
 selectAllAssociations = PG.Query "SELECT * FROM association"

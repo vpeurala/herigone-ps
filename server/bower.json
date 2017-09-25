@@ -31,6 +31,7 @@
     "purescript-aff": "^3.1.0",
     "purescript-exceptions": "^3.1.0",
     "purescript-foreign-generic": "^4.0.0",
-    "purescript-foreign": "^4.0.1"
+    "purescript-foreign": "^4.0.1",
+    "purescript-generics-rep": "^5.3.0"
   }
 }
