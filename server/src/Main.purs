@@ -13,43 +13,43 @@ import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 import Control.Monad.Eff.Exception (EXCEPTION, Error)
 
-import Data.Foreign (F, Foreign)
+import Data.Foreign (F, Foreign, readInt, readString)
 import Data.Foreign.Class (class Decode, decode)
 import Data.Foreign.Generic (defaultOptions, genericDecode)
 import Data.Foreign.Generic.Class (class GenericDecode)
 import Data.Foreign.Generic.Types (Options)
 import Data.Foreign.Index (readProp)
-import Data.Generic (class Generic)
+--import Data.Generic (class Generic)
+import Data.Generic (class Generic, gShow)
+import Data.Generic.Rep as Rep
+--import Data.Generic.Rep (class Generic)
 import Data.Int as Int
 import Data.Maybe as M
 import Data.Show (class Show)
 
-import Prelude (Unit, bind, const, discard, map, pure, show, unit, ($), (<>), (=<<))
+import Debug.Trace
 
-newtype Association = Association {
-  id :: String,
+import Prelude
+
+data Association = Association {
+  id :: Int,
   number :: String,
   word :: String
 }
 
-derive instance associationGeneric :: Generic Association
-instance associationShow :: Show Association where show (Association a) = "Association { id = " <> (show a.id) <> ", number = " <> a.number <> ", word = " <> a.word <> " }"
-{--
-instance associationGenericDecode :: GenericDecode Association where
-  decodeOpts :: Options -> Foreign -> F Association
-  decodeOpts opts fgn =
-    genericDecode defaultOptions fgn
---}
+derive instance genericAssociation :: Generic Association
+
+derive instance genericRepAssociation :: Rep.Generic Association _
+
+instance showAssociation :: Show Association where
+  show :: Association -> String
+  show = gShow
+
+--instance associationGenericDecode :: GenericDecode Association where
+--  decodeOpts = genericDecode
+
 instance associationDecode :: Decode Association where
-  decode obj = do
-    i <- decode =<< readProp "id" obj
-    n <- decode =<< readProp "number" obj
-    w <- decode =<< readProp "word" obj
-    pure $ Association {
-      id: i,
-      number: n,
-      word: w
-    }
+  decode = genericDecode defaultOptions
 
 selectAllAssociations :: PG.Query Association
 selectAllAssociations = PG.Query "SELECT id, number, word FROM association"
