@@ -26,10 +26,8 @@ RUN curl -s -O https://deb.nodesource.com/node_8.x/pool/main/n/nodejs/nodejs_8.4
 RUN dpkg -i nodejs_8.4.0-1nodesource1~xenial1_amd64.deb
 
 # Install and setup PostgreSQL and create the herigone database.
-RUN apt-get install -y postgresql postgresql-contrib
-RUN service postgresql start
-RUN su -l postgres -c 'createuser -s herigone'
-RUN su -l postgres -c 'createdb --encoding=UTF-8 --template=template0 --owner=herigone herigone'
+RUN apt-get install -y postgresql postgresql-client postgresql-contrib
+RUN service postgresql start && su -l postgres -c 'createuser -s herigone' && su -l postgres -c 'createdb --encoding=UTF-8 --template=template0 --owner=herigone herigone'
 
 # Create user node:node for running NodeJS.
 RUN addgroup --gid 1000 node
@@ -39,17 +37,15 @@ RUN adduser -u 1000 --ingroup node --disabled-password --shell /bin/sh node
 COPY server herigone-ps-server
 RUN chown -R node:node /herigone-ps-server
 
-# RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
+USER node
+WORKDIR /herigone-ps-server
 
-# USER node
-# WORKDIR /herigone-ps-server
-#
-# RUN npm config set prefix '~/.npm-global'
-#
-# RUN npm install -g purescript pulp bower
-# RUN bower install
-# RUN npm install
-#
-# EXPOSE 9771
-#
-# CMD ["pulp", "run"]
+RUN npm config set prefix '~/.npm-global'
+
+RUN npm install -g purescript pulp bower
+RUN bower install
+RUN npm install
+
+EXPOSE 9771
+
+CMD ["pulp", "run"]
