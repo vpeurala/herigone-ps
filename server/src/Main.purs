@@ -45,17 +45,30 @@ instance showAssociation :: Show Association where
   show :: Association -> String
   show = gShow
 
---instance associationGenericDecode :: GenericDecode Association where
---  decodeOpts = genericDecode
-
 instance associationDecode :: Decode Association where
-  decode = genericDecode defaultOptions
+  decode obj = do
+    pure $ Association {
+      id: 1,
+      number: "foo",
+      word: "bar"
+    }
+{--
+  decode obj = do
+    i <- decode =<< readProp "id" obj
+    n <- decode =<< readProp "number" obj
+    w <- decode =<< readProp "word" obj
+    pure $ Association {
+      id: i,
+      number: n,
+      word: w
+    }
+--}
 
 selectAllAssociations :: PG.Query Association
 selectAllAssociations = PG.Query "SELECT id, number, word FROM association"
 
 querySelectAllAssociations :: forall aff. PG.Client -> Aff (db :: PG.DB | aff) (Array Association)
-querySelectAllAssociations dbClient = PG.query selectAllAssociations [] dbClient
+querySelectAllAssociations dbClient = PG.query_ selectAllAssociations dbClient
 
 databaseConnectionInfo :: PG.ConnectionInfo
 databaseConnectionInfo = {
