@@ -49,4 +49,4 @@ RUN npm install
 
 EXPOSE 9771
 
-CMD service postgresql start && su -l node -c 'pulp run'
+CMD service postgresql start && su -l node -c 'export PATH=$PATH:/home/node/.npm-global/bin; cd /herigone-ps-server; pulp run;'
