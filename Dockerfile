@@ -38,15 +38,15 @@ RUN usermod -aG sudo node
 COPY server herigone-ps-server
 RUN chown -R node:node /herigone-ps-server
 
-USER node
+USER node:node
 WORKDIR /herigone-ps-server
 
+# Install the server dependencies.
 RUN npm config set prefix '~/.npm-global'
-
 RUN npm install -g purescript pulp bower
 RUN bower install
 RUN npm install
 
 EXPOSE 9771
 
-CMD sudo service postgresql start && pulp run
+CMD service postgresql start && su -l node -c 'pulp run'
