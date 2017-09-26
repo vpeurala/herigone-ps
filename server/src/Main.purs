@@ -47,13 +47,6 @@ instance showAssociation :: Show Association where
 
 instance associationDecode :: Decode Association where
   decode obj = do
-    pure $ Association {
-      id: 1,
-      number: "foo",
-      word: "bar"
-    }
-{--
-  decode obj = do
     i <- decode =<< readProp "id" obj
     n <- decode =<< readProp "number" obj
     w <- decode =<< readProp "word" obj
@@ -62,7 +55,6 @@ instance associationDecode :: Decode Association where
       number: n,
       word: w
     }
---}
 
 selectAllAssociations :: PG.Query Association
 selectAllAssociations = PG.Query "SELECT id, number, word FROM association"

@@ -1,5 +1,5 @@
 CREATE TABLE association (
-  id     BIGSERIAL PRIMARY KEY,
+  id     SERIAL PRIMARY KEY,
 	number VARCHAR NOT NULL,
   word   VARCHAR NOT NULL
 );
