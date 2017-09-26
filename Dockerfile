@@ -32,6 +32,7 @@ RUN service postgresql start && su -l postgres -c 'createuser -s herigone' && su
 # Create user node:node for running NodeJS.
 RUN addgroup --gid 1000 node
 RUN adduser -u 1000 --ingroup node --disabled-password --shell /bin/sh node
+RUN usermod -aG sudo node
 
 # Copy the server directory to the image and assign node:node as its owner.
 COPY server herigone-ps-server
@@ -48,4 +49,4 @@ RUN npm install
 
 EXPOSE 9771
 
-CMD ["pulp", "run"]
+CMD sudo service postgresql start && pulp run
