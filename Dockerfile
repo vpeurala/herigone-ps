@@ -24,6 +24,7 @@ RUN npm config set prefix '~/.npm-global'
 
 RUN npm install -g purescript pulp bower
 RUN bower install
+RUN npm install
 
 EXPOSE 9700
 

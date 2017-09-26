@@ -4,7 +4,7 @@
   "description": "herigone-ps-server",
   "main": "index.js",
   "dependencies": {
-    "pg": "^7.3.0"
+    "pg": "^6.4.1"
   },
   "devDependencies": {},
   "scripts": {
