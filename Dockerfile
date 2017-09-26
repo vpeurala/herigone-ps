@@ -28,16 +28,16 @@ RUN dpkg -i nodejs_8.4.0-1nodesource1~xenial1_amd64.deb
 # Install and setup PostgreSQL and create the herigone database.
 RUN apt-get install -y postgresql postgresql-contrib
 RUN service postgresql start
-# RUN su -l postgres -c 'createuser -s herigone'
-# RUN su -l postgres -c 'createdb --encoding=UTF-8 --owner=herigone herigone'
-#
-# # Create user node:node for running NodeJS.
-# RUN addgroup --gid 1000 node
-# RUN adduser -u 1000 --ingroup node --disabled-password --shell /bin/sh node
-#
-# # Copy the server directory to the image and assign node:node as its owner.
-# COPY server herigone-ps-server
-# RUN chown -R node:node /herigone-ps-server
+RUN su -l postgres -c 'createuser -s herigone'
+RUN su -l postgres -c 'createdb --encoding=UTF-8 --template=template0 --owner=herigone herigone'
+
+# Create user node:node for running NodeJS.
+RUN addgroup --gid 1000 node
+RUN adduser -u 1000 --ingroup node --disabled-password --shell /bin/sh node
+
+# Copy the server directory to the image and assign node:node as its owner.
+COPY server herigone-ps-server
+RUN chown -R node:node /herigone-ps-server
 
 # RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
 
