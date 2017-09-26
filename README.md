@@ -1,4 +1,4 @@
-Use Node.js v8.5.0 via NVM:
+Use Node.js v8.4.0 via NVM:
 
 `$ npm install -g bower pulp purescript`  
 `$ cd server`  
@@ -9,7 +9,7 @@ Use Node.js v8.5.0 via NVM:
 Create local database:
 
 `$ createuser -s herigone`  
-`$ createdb --encoding=UTF-8 --owner=arctech arctech`  
+`$ createdb --encoding=UTF-8 --owner=herigone herigone`  
 
 Use flyway migrations:
 
