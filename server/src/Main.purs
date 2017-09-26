@@ -13,6 +13,11 @@ import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 import Control.Monad.Eff.Exception (EXCEPTION, Error)
 
+import Data.Argonaut.Core (stringify)
+import Data.Argonaut.Encode (class EncodeJson)
+import Data.Argonaut.Encode.Class (encodeJson)
+import Data.Argonaut.Encode.Generic (gEncodeJson)
+
 import Data.Foreign.Class (class Decode)
 import Data.Foreign.Generic (defaultOptions, genericDecode)
 import Data.Generic (class Generic, gShow)
@@ -38,6 +43,9 @@ instance showAssociation :: Show Association where
 
 instance decodeAssociation :: Decode Association where
   decode = genericDecode (defaultOptions { unwrapSingleConstructors = true })
+
+instance encodeJsonAssociation :: EncodeJson Association where
+  encodeJson = gEncodeJson
 
 selectAllAssociations :: PG.Query Association
 selectAllAssociations = PG.Query "SELECT id, number, word FROM association"
@@ -98,7 +106,7 @@ respondToGET dbClient request response = do
   liftEff $ log "Before DB query"
   queryResult <- querySelectAllAssociations dbClient
   liftEff $ log "After DB query"
-  _ <- liftEff $ S.writeString responseStream UTF8 (show queryResult) (pure unit)
+  _ <- liftEff $ S.writeString responseStream UTF8 (stringify (encodeJson queryResult)) (pure unit)
   liftEff $ S.end responseStream (pure unit)
 
 respondToUnsupportedMethod :: forall aff. H.Request -> H.Response -> Aff (http :: H.HTTP, console :: CONSOLE | aff) Unit
