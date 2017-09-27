@@ -20,6 +20,8 @@ RUN dpkg-reconfigure locales
 RUN apt-get install -y apt-utils
 RUN apt-get install -y curl
 RUN apt-get install -y rlwrap
+RUN apt-get install -y software-properties-common python-software-properties
+RUN apt-get install -y sudo
 
 # Install NodeJS 8.4.0.
 RUN curl -s -O https://deb.nodesource.com/node_8.x/pool/main/n/nodejs/nodejs_8.4.0-1nodesource1~xenial1_amd64.deb
@@ -28,11 +30,11 @@ RUN dpkg -i nodejs_8.4.0-1nodesource1~xenial1_amd64.deb
 # Install and setup PostgreSQL and create the herigone database.
 RUN apt-get install -y postgresql postgresql-client postgresql-contrib
 RUN service postgresql start && \
-  su -l postgres -c 'createuser -s herigone' && \
-  su -l postgres -c 'createdb --encoding=UTF-8 --template=template0 --owner=herigone herigone' && \
+  su -l postgres -c "createuser -s herigone" && \
+  su -l postgres -c "createdb --encoding=UTF-8 --template=template0 --owner=herigone herigone" && \
   su -l postgres -c "psql herigone postgres -c \"ALTER USER herigone PASSWORD 'herigone'\""
 
-# Create user node:node for running NodeJS.
+# Create user node:node for running NodeJS, and add it to sudoers group.
 RUN addgroup --gid 1000 node
 RUN adduser -u 1000 --ingroup node --disabled-password --shell /bin/sh node
 RUN usermod -aG sudo node
@@ -41,6 +43,23 @@ RUN usermod -aG sudo node
 COPY server herigone-ps-server
 RUN chown -R node:node /herigone-ps-server
 
+# Install Java 8, it is needed by Flyway.
+RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
+  add-apt-repository -y ppa:webupd8team/java && \
+  apt-get update && \
+  apt-get install -y oracle-java8-installer oracle-java8-set-default
+
+# Install Flyway for database migrations.
+RUN curl -0 -s -O https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/4.2.0/flyway-commandline-4.2.0-linux-x64.tar.gz && \
+  tar -xvzf flyway-commandline-4.2.0-linux-x64.tar.gz && \
+  ln -s /flyway-4.2.0/flyway /usr/local/bin/flyway && \
+  chmod -R 755 /flyway-4.2.0 && \
+  chmod 755 /usr/local/bin/flyway
+
+# Give everybody in sudoers group permission to sudo without password.
+RUN sed -i 's/^%sudo.*$/%sudo ALL=NOPASSWD: ALL/' /etc/sudoers
+
+# Switch to user node in /herigone-ps-server directory to build the server.
 USER node:node
 WORKDIR /herigone-ps-server
 
@@ -49,6 +68,7 @@ RUN npm config set prefix '~/.npm-global'
 RUN npm install -g purescript pulp bower
 RUN bower install
 RUN npm install
+RUN sudo service postgresql start && flyway migrate
 
 EXPOSE 9771
 
