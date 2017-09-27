@@ -12,8 +12,7 @@
     "**/.*",
     "node_modules",
     "bower_components",
-    "test",
-    "tests"
+    "output"
   ],
   "dependencies": {
     "purescript-node-http": "^4.1.0",
@@ -30,10 +29,6 @@
     "purescript-node-postgres": "^3.0.0",
     "purescript-aff": "^3.1.0",
     "purescript-exceptions": "^3.1.0",
-    "purescript-foreign-generic": "^4.0.0",
-    "purescript-foreign": "^4.0.1",
-    "purescript-generics-rep": "^5.3.0",
-    "purescript-generics": "^4.0.0",
     "purescript-debug": "^3.0.0",
     "purescript-argonaut": "^3.1.0",
     "purescript-argonaut-codecs": "^3.2.0",

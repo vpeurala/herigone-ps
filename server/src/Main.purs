@@ -14,38 +14,13 @@ import Control.Monad.Eff.Console (CONSOLE, log)
 import Control.Monad.Eff.Exception (EXCEPTION, Error)
 
 import Data.Argonaut.Core (stringify)
-import Data.Argonaut.Encode (class EncodeJson)
-import Data.Argonaut.Encode.Class (encodeJson)
-import Data.Argonaut.Encode.Generic (gEncodeJson)
 
-import Data.Foreign.Class (class Decode)
-import Data.Foreign.Generic (defaultOptions, genericDecode)
-import Data.Generic (class Generic, gShow)
-import Data.Generic.Rep as Rep
 import Data.Int as Int
 import Data.Maybe as M
 
 import Prelude
 
-data Association = Association {
-  id :: Int,
-  number :: String,
-  word :: String
-}
-
-derive instance genericAssociation :: Generic Association
-
-derive instance genericRepAssociation :: Rep.Generic Association _
-
-instance showAssociation :: Show Association where
-  show :: Association -> String
-  show = gShow
-
-instance decodeAssociation :: Decode Association where
-  decode = genericDecode (defaultOptions { unwrapSingleConstructors = true })
-
-instance encodeJsonAssociation :: EncodeJson Association where
-  encodeJson = gEncodeJson
+import Herigone.Domain
 
 selectAllAssociations :: PG.Query Association
 selectAllAssociations = PG.Query "SELECT id, number, word FROM association"
