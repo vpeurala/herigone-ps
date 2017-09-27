@@ -6,10 +6,6 @@
   "dependencies": {
     "pg": "^6.4.1"
   },
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vpeurala/herigone-ps.git"

@@ -18,7 +18,6 @@
     "purescript-node-http": "^4.1.0",
     "purescript-prelude": "^3.1.0",
     "purescript-console": "^3.0.0",
-    "purescript-psci-support": "^3.0.0",
     "purescript-unsafe-coerce": "^3.0.0",
     "purescript-partial": "^1.2.1",
     "purescript-maybe": "^3.0.0",
@@ -32,6 +31,10 @@
     "purescript-debug": "^3.0.0",
     "purescript-argonaut": "^3.1.0",
     "purescript-argonaut-codecs": "^3.2.0",
-    "purescript-argonaut-generic": "^1.2.0"
+    "purescript-argonaut-generic": "^1.2.0",
+    "herigone-ps-common": "../common"
+  },
+  "devDependencies": {
+    "purescript-psci-support": "^3.0.0"
   }
 }
