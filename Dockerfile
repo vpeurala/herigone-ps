@@ -27,7 +27,10 @@ RUN dpkg -i nodejs_8.4.0-1nodesource1~xenial1_amd64.deb
 
 # Install and setup PostgreSQL and create the herigone database.
 RUN apt-get install -y postgresql postgresql-client postgresql-contrib
-RUN service postgresql start && su -l postgres -c 'createuser -s herigone' && su -l postgres -c 'createdb --encoding=UTF-8 --template=template0 --owner=herigone herigone'
+RUN service postgresql start && \
+  su -l postgres -c 'createuser -s herigone' && \
+  su -l postgres -c 'createdb --encoding=UTF-8 --template=template0 --owner=herigone herigone' && \
+  su -l postgres -c "psql herigone postgres -c \"ALTER USER herigone PASSWORD 'herigone'\""
 
 # Create user node:node for running NodeJS.
 RUN addgroup --gid 1000 node
