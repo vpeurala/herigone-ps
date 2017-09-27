@@ -1,10 +1,10 @@
 {
-  "name": "herigone-ps-server",
+  "name": "purescript-herigone-server",
   "homepage": "https://github.com/vpeurala/herigone-ps",
   "authors": [
     "Ville Peurala <ville.peurala@gmail.com>"
   ],
-  "description": "herigone-ps-server",
+  "description": "purescript-herigone-server",
   "main": "src/Main.purs",
   "license": "MIT",
   "private": true,
@@ -32,7 +32,7 @@
     "purescript-argonaut": "^3.1.0",
     "purescript-argonaut-codecs": "^3.2.0",
     "purescript-argonaut-generic": "^1.2.0",
-    "herigone-ps-common": "../common"
+    "purescript-herigone-common": "../common"
   },
   "devDependencies": {
     "purescript-psci-support": "^3.0.0"

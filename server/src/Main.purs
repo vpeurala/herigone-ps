@@ -14,6 +14,7 @@ import Control.Monad.Eff.Console (CONSOLE, log)
 import Control.Monad.Eff.Exception (EXCEPTION, Error)
 
 import Data.Argonaut.Core (stringify)
+import Data.Argonaut.Encode (encodeJson)
 
 import Data.Int as Int
 import Data.Maybe as M

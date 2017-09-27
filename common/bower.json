@@ -1,10 +1,10 @@
 {
-  "name": "herigone-ps-common",
+  "name": "purescript-herigone-common",
   "homepage": "https://github.com/vpeurala/herigone-ps",
   "authors": [
     "Ville Peurala <ville.peurala@gmail.com>"
   ],
-  "description": "herigone-ps-common",
+  "description": "purescript-herigone-common",
   "license": "MIT",
   "private": true,
   "ignore": [
