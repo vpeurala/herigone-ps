@@ -19,9 +19,9 @@ import Data.Argonaut.Encode (encodeJson)
 import Data.Int as Int
 import Data.Maybe as M
 
-import Prelude
+import Prelude (Unit, bind, const, discard, map, pure, show, unit, ($), (<>))
 
-import Herigone.Domain
+import Herigone.Domain (Association)
 
 selectAllAssociations :: PG.Query Association
 selectAllAssociations = PG.Query "SELECT id, number, word FROM association"

@@ -17,11 +17,7 @@ RUN locale-gen en_US.UTF-8
 RUN dpkg-reconfigure locales
 
 # Install some necessary tools.
-RUN apt-get install -y apt-utils
-RUN apt-get install -y curl
-RUN apt-get install -y rlwrap
-RUN apt-get install -y software-properties-common python-software-properties
-RUN apt-get install -y sudo
+RUN apt-get install -y apt-utils curl rlwrap software-properties-common python-software-properties sudo git vim
 
 # Install NodeJS 8.4.0.
 RUN curl -s -O https://deb.nodesource.com/node_8.x/pool/main/n/nodejs/nodejs_8.4.0-1nodesource1~xenial1_amd64.deb
@@ -39,9 +35,11 @@ RUN addgroup --gid 1000 node
 RUN adduser -u 1000 --ingroup node --disabled-password --shell /bin/sh node
 RUN usermod -aG sudo node
 
-# Copy the server directory to the image and assign node:node as its owner.
-COPY server herigone-ps-server
-RUN chown -R node:node /herigone-ps-server
+# Copy the source directories to the image and assign node:node as their owner.
+COPY purescript-herigone-common purescript-herigone-common
+COPY purescript-herigone-server purescript-herigone-server
+RUN chown -R node:node /purescript-herigone-common
+RUN chown -R node:node /purescript-herigone-server
 
 # Install Java 8, it is needed by Flyway.
 RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
@@ -59,17 +57,26 @@ RUN curl -0 -s -O https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline
 # Give everybody in sudoers group permission to sudo without password.
 RUN sed -i 's/^%sudo.*$/%sudo ALL=NOPASSWD: ALL/' /etc/sudoers
 
-# Switch to user node in /herigone-ps-server directory to build the server.
+# Switch to user node to build the sources.
 USER node:node
-WORKDIR /herigone-ps-server
 
-# Install the server dependencies.
+# Install the global npm libraries in ~/.npm-global.
 RUN npm config set prefix '~/.npm-global'
 RUN npm install -g purescript pulp bower
+
+# Build the "common" subproject.
+WORKDIR /purescript-herigone-common
 RUN bower install
 RUN npm install
+
+# Build the "server" subproject.
+WORKDIR /purescript-herigone-server
+RUN bower install
+RUN npm install
+
+# Perform Flyway migrations.
 RUN sudo service postgresql start && flyway migrate
 
 EXPOSE 9771
 
-CMD service postgresql start && su -l node -c 'export PATH=$PATH:/home/node/.npm-global/bin; cd /herigone-ps-server; pulp run;'
+CMD service postgresql start && su -l node -c 'export PATH=$PATH:/home/node/.npm-global/bin; cd /purescript-herigone-server; pulp run;'

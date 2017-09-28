@@ -1,0 +1,19 @@
+{
+  "name": "purescript-herigone-common",
+  "version": "0.0.1",
+  "description": "purescript-herigone-common",
+  "main": "index.js",
+  "scripts": {
+    "test": "none"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vpeurala/herigone-ps.git"
+  },
+  "author": "Ville Peurala",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vpeurala/herigone-ps/issues"
+  },
+  "homepage": "https://github.com/vpeurala/herigone-ps#readme"
+}
