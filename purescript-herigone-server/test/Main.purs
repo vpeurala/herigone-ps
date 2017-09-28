@@ -43,7 +43,7 @@ main = run [consoleReporter] do
         port `shouldEqual` 9771
         logs <- liftEff getCapturedConsoleLogs
         liftEff turnOffConsoleLogCapturing
-        logs `shouldEqual` ["Environment variable HERIGONE_SERVER_PORT not set. Using the default port of 9771."]
+        logs `shouldEqual` ["Environment variable HERIGONE_SERVER_PORT set to a value of \"foo\" which could not be parsed as an integer. Using the default port of 9771."]
 
 foreign import turnOnConsoleLogCapturing :: forall eff. Eff (console :: CONSOLE | eff) Unit
 
