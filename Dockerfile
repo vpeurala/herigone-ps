@@ -68,11 +68,13 @@ RUN npm install -g purescript pulp bower
 WORKDIR /purescript-herigone-common
 RUN bower install
 RUN npm install
+RUN pulp build
 
 # Build the "server" subproject.
 WORKDIR /purescript-herigone-server
 RUN bower install
 RUN npm install
+RUN pulp build
 
 # Perform Flyway migrations.
 RUN sudo service postgresql start && flyway migrate
