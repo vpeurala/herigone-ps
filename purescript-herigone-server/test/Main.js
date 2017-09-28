@@ -1,5 +1,18 @@
 "use strict";
 
-exports.captureConsoleLogs = function() {
-  console.log("captureConsoleLogs called!");
+var originalConsoleLog = console.log;
+var logs = [];
+
+exports.turnOnConsoleLogCapturing = function() {
+  console.log = function(s) {
+    logs.push(s);
+  };
+};
+
+exports.getCapturedConsoleLogs = function() {
+  return logs;
+};
+
+exports.turnOffConsoleLogCapturing = function() {
+  console.log = originalConsoleLog;
 };
