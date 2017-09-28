@@ -15,18 +15,22 @@ import Herigone.Environment (getHttpServerPort)
 
 main :: Eff (RunnerEffects ()) Unit
 main = run [consoleReporter] do
-  describe "Capturing console logs" do
-    it "works" do
-      _ <- liftEff turnOnConsoleLogCapturing
-      liftEff $ log "foo"
-      logs <- liftEff getCapturedConsoleLogs
-      logs `shouldEqual` ["foo"]
-      liftEff turnOffConsoleLogCapturing
-
-  describe "getHttpServerPort" do
-    it "returns the default port if not set" do
-      port <- liftEff getHttpServerPort
-      port `shouldEqual` 9771
+  describe "Herigone.Environment PureScript module" do
+    describe "Capturing console logs" do
+      it "enables us to see what is logged" do
+        liftEff turnOnConsoleLogCapturing
+        liftEff $ log "foo"
+        logs <- liftEff getCapturedConsoleLogs
+        liftEff turnOffConsoleLogCapturing
+        logs `shouldEqual` ["foo"]
+    describe "Function getHttpServerPort" do
+      it "returns the default port if not set" do
+        liftEff turnOnConsoleLogCapturing
+        port <- liftEff getHttpServerPort
+        port `shouldEqual` 9771
+        logs <- liftEff getCapturedConsoleLogs
+        liftEff turnOffConsoleLogCapturing
+        logs `shouldEqual` ["Environment variable HERIGONE_SERVER_PORT not set. Using the default port of 9771."]
 
 foreign import turnOnConsoleLogCapturing :: forall eff. Eff (console :: CONSOLE | eff) Unit
 

@@ -4,6 +4,7 @@ var originalConsoleLog = console.log;
 var logs = [];
 
 exports.turnOnConsoleLogCapturing = function() {
+  originalConsoleLog = console.log;
   console.log = function(s) {
     logs.push(s);
   };
@@ -15,4 +16,5 @@ exports.getCapturedConsoleLogs = function() {
 
 exports.turnOffConsoleLogCapturing = function() {
   console.log = originalConsoleLog;
+  logs = [];
 };
