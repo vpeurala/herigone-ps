@@ -3,7 +3,7 @@ module Main where
 import Node.Encoding (Encoding(UTF8))
 import Node.HTTP as H
 import Node.Stream as S
-import Node.Process (PROCESS, lookupEnv)
+import Node.Process (PROCESS)
 
 import Control.Monad.Aff (Aff, launchAff, runAff)
 import Control.Monad.Eff (Eff)
@@ -14,34 +14,14 @@ import Control.Monad.Eff.Exception (EXCEPTION, Error)
 import Data.Argonaut.Core (stringify)
 import Data.Argonaut.Encode (encodeJson)
 
-import Data.Int as Int
 import Data.Maybe as M
 
 import Database.Postgres as PG
 
 import Prelude (Unit, bind, const, discard, map, pure, show, unit, ($), (<>))
 
-import Herigone.DB
-
-defaultPort :: Int
-defaultPort = 9771
-
-getPort :: forall eff. Eff (process :: PROCESS, console :: CONSOLE | eff) Int
-getPort = do
-  environmentVariable <- lookupEnv "HERIGONE_SERVER_PORT"
-  case environmentVariable of
-    M.Nothing -> do
-      log ("Environment variable HERIGONE_SERVER_PORT not set.")
-      pure defaultPort
-    M.Just environmentVariableValue -> do
-      let parsedPort = Int.fromString environmentVariableValue
-      case parsedPort of
-        M.Nothing -> do
-          log ("Environment variable HERIGONE_SERVER_PORT set to a value of \"" <> environmentVariableValue <> "\" which could not be parsed as an integer.")
-          pure defaultPort
-        M.Just portNumber -> do
-          log ("Environment variable HERIGONE_SERVER_PORT set to a value of " <> (show portNumber) <> ".")
-          pure portNumber
+import Herigone.DB (querySelectAllAssociations)
+import Herigone.Environment (getHttpServerPort)
 
 getListenOptions :: Int -> H.ListenOptions
 getListenOptions listeningPort = {
@@ -100,7 +80,7 @@ createServerFunction request response =
 
 asyncMain :: forall aff. Aff ( db :: PG.DB, console :: CONSOLE, process :: PROCESS, http :: H.HTTP | aff) Unit
 asyncMain = do
-  port <- liftEff getPort
+  port <- liftEff getHttpServerPort
   server <- liftEff $ H.createServer createServerFunction
   liftEff $ H.listen server (getListenOptions port) (listenCallback port)
   pure unit
