@@ -64,9 +64,7 @@ respondToGET request response = do
   liftEff $ H.setStatusMessage response "OK"
   liftEff $ H.setHeader response "Connection" "close"
   liftEff $ H.setHeader response "Transfer-Encoding" "identity"
-  liftEff $ log "Before DB query"
   queryResult <- querySelectAllAssociations
-  liftEff $ log "After DB query"
   _ <- liftEff $ S.writeString responseStream UTF8 (stringify (encodeJson queryResult)) (pure unit)
   liftEff $ S.end responseStream (pure unit)
 
