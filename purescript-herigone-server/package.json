@@ -1,8 +1,7 @@
 {
-  "name": "herigone-ps-server",
-  "version": "1.0.0",
-  "description": "herigone-ps-server",
-  "main": "index.js",
+  "name": "purescript-herigone-server",
+  "version": "0.0.1",
+  "description": "purescript-herigone-server",
   "dependencies": {
     "pg": "^6.4.1"
   },
