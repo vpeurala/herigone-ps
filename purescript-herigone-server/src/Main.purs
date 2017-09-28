@@ -5,8 +5,6 @@ import Node.HTTP as H
 import Node.Stream as S
 import Node.Process (PROCESS, lookupEnv)
 
-import Database.Postgres as PG
-
 import Control.Monad.Aff (Aff, launchAff, runAff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff)
@@ -19,24 +17,11 @@ import Data.Argonaut.Encode (encodeJson)
 import Data.Int as Int
 import Data.Maybe as M
 
+import Database.Postgres as PG
+
 import Prelude (Unit, bind, const, discard, map, pure, show, unit, ($), (<>))
 
-import Herigone.Domain (Association)
-
-selectAllAssociations :: PG.Query Association
-selectAllAssociations = PG.Query "SELECT id, number, word FROM association"
-
-querySelectAllAssociations :: forall aff. PG.Client -> Aff (db :: PG.DB | aff) (Array Association)
-querySelectAllAssociations dbClient = PG.query_ selectAllAssociations dbClient
-
-databaseConnectionInfo :: PG.ConnectionInfo
-databaseConnectionInfo = {
-  host: "0.0.0.0",
-  port: 5432,
-  db: "herigone",
-  user: "herigone",
-  password: "herigone"
-}
+import Herigone.DB
 
 defaultPort :: Int
 defaultPort = 9771
@@ -70,8 +55,8 @@ listenCallback port = do
   log ("HTTP server listening on port " <> (show port) <> ".")
   pure unit
 
-respondToGET :: forall aff. PG.Client -> H.Request -> H.Response -> Aff (db :: PG.DB, http :: H.HTTP, console :: CONSOLE | aff) Unit
-respondToGET dbClient request response = do
+respondToGET :: forall aff. H.Request -> H.Response -> Aff (db :: PG.DB, http :: H.HTTP, console :: CONSOLE | aff) Unit
+respondToGET request response = do
   liftEff $ log "Responding to GET"
   let responseStream = H.responseAsStream response
       url            = H.requestURL request
@@ -80,7 +65,7 @@ respondToGET dbClient request response = do
   liftEff $ H.setHeader response "Connection" "close"
   liftEff $ H.setHeader response "Transfer-Encoding" "identity"
   liftEff $ log "Before DB query"
-  queryResult <- querySelectAllAssociations dbClient
+  queryResult <- querySelectAllAssociations
   liftEff $ log "After DB query"
   _ <- liftEff $ S.writeString responseStream UTF8 (stringify (encodeJson queryResult)) (pure unit)
   liftEff $ S.end responseStream (pure unit)
@@ -93,13 +78,13 @@ respondToUnsupportedMethod request response = do
   liftEff $ H.setHeader response "Connection" "close"
   liftEff $ S.end responseStream (pure unit)
 
-respond :: forall aff. PG.Client -> H.Request -> H.Response -> Aff (db :: PG.DB, http :: H.HTTP, console :: CONSOLE | aff) Unit
-respond dbClient request response = do
+respond :: forall aff. H.Request -> H.Response -> Aff (db :: PG.DB, http :: H.HTTP, console :: CONSOLE | aff) Unit
+respond request response = do
   let method = H.requestMethod request
       url    = H.requestURL request
   liftEff $ log ("Request with method: '" <> method <> "' to URL: '" <> url <> "'.")
   case method of
-    "GET"  -> respondToGET dbClient request response
+    "GET"  -> respondToGET request response
     _      -> respondToUnsupportedMethod request response
 
 handleRespondError :: forall eff. Error -> Eff (console :: CONSOLE | eff) Unit
@@ -110,16 +95,15 @@ handleRespondSuccess :: forall a eff. a -> Eff (console :: CONSOLE | eff) Unit
 handleRespondSuccess succ =
   log ("Success!")
 
-createServerFunction :: forall eff. PG.Client -> H.Request -> H.Response -> Eff (db :: PG.DB, http :: H.HTTP, console :: CONSOLE | eff) Unit
-createServerFunction dbClient request response =
-  let canceler = runAff handleRespondError handleRespondSuccess (respond dbClient request response)
+createServerFunction :: forall eff. H.Request -> H.Response -> Eff (db :: PG.DB, http :: H.HTTP, console :: CONSOLE | eff) Unit
+createServerFunction request response =
+  let canceler = runAff handleRespondError handleRespondSuccess (respond request response)
   in  map (const unit) canceler
 
 asyncMain :: forall aff. Aff ( db :: PG.DB, console :: CONSOLE, process :: PROCESS, http :: H.HTTP | aff) Unit
 asyncMain = do
-  dbClient <- PG.connect databaseConnectionInfo
   port <- liftEff getPort
-  server <- liftEff $ H.createServer (createServerFunction dbClient)
+  server <- liftEff $ H.createServer createServerFunction
   liftEff $ H.listen server (getListenOptions port) (listenCallback port)
   pure unit
 
