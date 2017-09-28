@@ -7,18 +7,20 @@ import Test.Spec.Runner (RunnerEffects, run)
 
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff)
+import Control.Monad.Eff.Console (CONSOLE)
 
-import Prelude (Unit, bind, discard, pure)
+import Prelude (Unit, bind, discard)
 
 import Herigone.Environment (getHttpServerPort)
 
 main :: Eff (RunnerEffects ()) Unit
 main = run [consoleReporter] do
   describe "captureConsoleLogs" do
-    pure captureConsoleLogs
+    it "works" do
+      liftEff captureConsoleLogs
   describe "getHttpServerPort" do
     it "returns the default port if not set" do
       port <- liftEff getHttpServerPort
       port `shouldEqual` 9771
 
-foreign import captureConsoleLogs :: Unit
+foreign import captureConsoleLogs :: forall eff. Eff (console :: CONSOLE | eff) Unit
