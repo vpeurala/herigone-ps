@@ -59,6 +59,14 @@ respondToGET request response = do
       fileContent <- readTextFile UTF8 "static/index.html"
       _ <- liftEff $ S.writeString responseStream UTF8 fileContent (pure unit)
       liftEff $ S.end responseStream (pure unit)
+    "/herigone.js" -> do
+      liftEff $ H.setStatusCode response 200
+      liftEff $ H.setStatusMessage response "OK"
+      liftEff $ H.setHeader response "Connection" "close"
+      liftEff $ H.setHeader response "Transfer-Encoding" "identity"
+      fileContent <- readTextFile UTF8 "static/herigone.js"
+      _ <- liftEff $ S.writeString responseStream UTF8 fileContent (pure unit)
+      liftEff $ S.end responseStream (pure unit)
     _ -> do
       liftEff $ H.setStatusCode response 404
       liftEff $ H.setStatusMessage response "Not Found"

@@ -35,12 +35,6 @@ RUN addgroup --gid 1000 node
 RUN adduser -u 1000 --ingroup node --disabled-password --shell /bin/sh node
 RUN usermod -aG sudo node
 
-# Copy the source directories to the image and assign node:node as their owner.
-COPY purescript-herigone-common purescript-herigone-common
-COPY purescript-herigone-server purescript-herigone-server
-RUN chown -R node:node /purescript-herigone-common
-RUN chown -R node:node /purescript-herigone-server
-
 # Install Java 8, it is needed by Flyway.
 RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
   add-apt-repository -y ppa:webupd8team/java && \
@@ -57,6 +51,14 @@ RUN curl -0 -s -O https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline
 # Give everybody in sudoers group permission to sudo without password.
 RUN sed -i 's/^%sudo.*$/%sudo ALL=NOPASSWD: ALL/' /etc/sudoers
 
+# Copy the source directories to the image and assign node:node as their owner.
+COPY purescript-herigone-common purescript-herigone-common
+COPY purescript-herigone-client purescript-herigone-client
+COPY purescript-herigone-server purescript-herigone-server
+RUN chown -R node:node /purescript-herigone-common
+RUN chown -R node:node /purescript-herigone-client
+RUN chown -R node:node /purescript-herigone-server
+
 # Switch to user node to build the sources.
 USER node:node
 
@@ -69,6 +71,13 @@ WORKDIR /purescript-herigone-common
 RUN bower install
 RUN npm install
 RUN pulp build
+
+# Build the "client" subproject.
+WORKDIR /purescript-herigone-client
+RUN bower install
+RUN npm install
+RUN pulp build -O --to herigone.js
+RUN mv herigone.js /purescript-herigone-server/static
 
 # Build the "server" subproject.
 WORKDIR /purescript-herigone-server
