@@ -87,6 +87,5 @@ asyncMain = do
 
 main :: forall eff. Eff (db :: PG.DB, exception :: EXCEPTION, console :: CONSOLE, process :: PROCESS, http :: H.HTTP | eff) Unit
 main = do
-  -- TODO: Maybe do something with the canceler returned by launchAff.
-  _ <- launchAff asyncMain
+  canceler <- launchAff asyncMain
   pure unit
