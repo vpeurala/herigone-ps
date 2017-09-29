@@ -25,10 +25,10 @@ import Herigone.Environment (getHttpServerPort)
 
 getListenOptions :: Int -> H.ListenOptions
 getListenOptions listeningPort = {
-    hostname: "0.0.0.0",
-    port: listeningPort,
-    backlog: M.Nothing
-  }
+  hostname: "0.0.0.0",
+  port: listeningPort,
+  backlog: M.Nothing
+}
 
 listenCallback :: forall eff. Int -> Eff (console :: CONSOLE, http :: H.HTTP, process :: PROCESS | eff) Unit
 listenCallback port = do
