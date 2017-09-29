@@ -1,0 +1,15 @@
+{
+  "name": "purescript-herigone-client",
+  "version": "0.0.1",
+  "description": "purescript-herigone-client",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vpeurala/herigone-ps.git"
+  },
+  "author": "Ville Peurala",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vpeurala/herigone-ps/issues"
+  },
+  "homepage": "https://github.com/vpeurala/herigone-ps#readme"
+}
