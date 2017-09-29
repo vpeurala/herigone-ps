@@ -78,14 +78,14 @@ createServerFunction request response =
   let canceler = runAff handleRespondError handleRespondSuccess (respond request response)
   in  map (const unit) canceler
 
-asyncMain :: forall aff. Aff ( db :: PG.DB, console :: CONSOLE, process :: PROCESS, http :: H.HTTP | aff) Unit
+asyncMain :: forall aff. Aff (db :: PG.DB, console :: CONSOLE, process :: PROCESS, http :: H.HTTP | aff) Unit
 asyncMain = do
   port <- liftEff getHttpServerPort
   server <- liftEff $ H.createServer createServerFunction
   liftEff $ H.listen server (getListenOptions port) (listenCallback port)
   pure unit
 
-main :: forall eff. Eff ( db :: PG.DB, exception :: EXCEPTION, console :: CONSOLE, process :: PROCESS, http :: H.HTTP | eff) Unit
+main :: forall eff. Eff (db :: PG.DB, exception :: EXCEPTION, console :: CONSOLE, process :: PROCESS, http :: H.HTTP | eff) Unit
 main = do
   -- TODO: Maybe do something with the canceler returned by launchAff.
   _ <- launchAff asyncMain
