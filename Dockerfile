@@ -10,6 +10,7 @@ ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 ENV PATH=$PATH:/home/node/.npm-global/bin
 
 # This has to be done first before installing anything.
+# TODO: Should be combined with apt-get installs, see https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/#run
 RUN apt-get update
 
 # Fix locale problems.
