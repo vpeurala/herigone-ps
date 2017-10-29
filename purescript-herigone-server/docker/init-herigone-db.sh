@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -e
+
+psql -v ON_ERROR_STOP=1 <<-EOSQL
+    CREATE ROLE herigone WITH CREATEDB CREATEROLE LOGIN REPLICATION PASSWORD 'xwnk0cddsPGXKNps';
+    CREATE DATABASE herigone OWNER=herigone ENCODING='UTF8';
+    GRANT ALL PRIVILEGES ON DATABASE herigone TO herigone;
+EOSQL
