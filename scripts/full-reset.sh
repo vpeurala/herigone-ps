@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-set -x
+set -ex
 PROJECT_ROOT=$(git rev-parse --show-toplevel);
-docker network rm herigone-network 2>/dev/null;
+docker network rm herigone-network || true;
 $PROJECT_ROOT/scripts/create-network.sh;
 $PROJECT_ROOT/scripts/docker-destroy-all-containers.sh;
 $PROJECT_ROOT/scripts/docker-destroy-all-images.sh;
