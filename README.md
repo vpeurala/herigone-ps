@@ -24,3 +24,8 @@ Use flyway migrations:
 
 `$ cd <PROJECT_ROOT>/purescript-herigone-server`  
 `$ flyway migrate`  
+
+Start server:
+
+`$ cd <PROJECT_ROOT>/purescript-herigone-server`  
+`$ pulp run`  
