@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-docker build -t vpeurala/herigone-ps-nginx:latest .
+docker build --file=Dockerfile --tag=vpeurala/herigone-ps-nginx:latest .
