@@ -1,7 +1,7 @@
-Use Node.js v8.4.0 via NVM:
+Use Node.js v8.8.1 via NVM:
 
 `$ npm install -g bower pulp purescript`  
-`$ cd server`  
+`$ cd purescript-herigone-server`  
 `$ bower install`  
 `$ npm install`  
 `$ pulp --watch run --jobs 1`  
