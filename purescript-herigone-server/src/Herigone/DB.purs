@@ -21,7 +21,7 @@ databaseClient = PG.connect databaseConnectionInfo
 
 databaseConnectionInfo :: PG.ConnectionInfo
 databaseConnectionInfo = {
-  host: "0.0.0.0",
+  host: "herigone-ps-db",
   port: 5432,
   db: "herigone",
   user: "herigone",
