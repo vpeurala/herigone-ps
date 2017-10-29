@@ -25,5 +25,5 @@ databaseConnectionInfo = {
   port: 5432,
   db: "herigone",
   user: "herigone",
-  password: "herigone"
+  password: "xwnk0cddsPGXKNps"
 }
