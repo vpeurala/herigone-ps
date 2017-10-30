@@ -1,10 +1,12 @@
 #!/usr/bin/env sh
-rm -rf purescript-herigone-common/.pulp-cache
-rm -rf purescript-herigone-common/bower_components
-rm -rf purescript-herigone-common/node_modules
-rm -rf purescript-herigone-common/output
+PROJECT_ROOT=$(git rev-parse --show-toplevel);
+pushd .;
+for MODULE in $(ls -d $PROJECT_ROOT/purescript-herigone-*);
+  do cd $MODULE;
+  rm -rf .pulp-cache;
+  rm -rf bower_components;
+  rm -rf node_modules;
+  rm -rf output;
+done;
+popd;
 
-rm -rf purescript-herigone-server/.pulp-cache
-rm -rf purescript-herigone-server/bower_components
-rm -rf purescript-herigone-server/node_modules
-rm -rf purescript-herigone-server/output
