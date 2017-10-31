@@ -34,6 +34,10 @@
   version "^4.0.0"
   resolved "https://codeload.github.com/purescript/purescript-arrays/tar.gz/021002564cbf2cc612644249ffd743b0f5cd5dc0"
 
+"@bower_components/purescript-assert@purescript/purescript-assert#^3.0.0":
+  version "^3.0.0"
+  resolved "https://codeload.github.com/purescript/purescript-assert/tar.gz/62bc3b0b103d781e42460e5f9b5246b981c63826"
+
 "@bower_components/purescript-avar@slamdata/purescript-avar#^2.0.0":
   version "^2.0.0"
   resolved "https://codeload.github.com/slamdata/purescript-avar/tar.gz/bf4fe9c85e23c1ac1ab8a2d3120554898ee1d0c5"
@@ -246,7 +250,7 @@
   version "^2.0.0"
   resolved "https://codeload.github.com/garyb/purescript-newtype/tar.gz/5f0557944afe85e3e830be9a8df43522311326e8"
 
-"@bower_components/purescript-node-buffer@purescript/purescript-node-buffer#^3.0.1":
+"@bower_components/purescript-node-buffer@purescript/purescript-node-buffer#^3.0.0", "@bower_components/purescript-node-buffer@purescript/purescript-node-buffer#^3.0.1":
   version "^3.0.1"
   resolved "https://codeload.github.com/purescript/purescript-node-buffer/tar.gz/6b7a3f4ce4a70b8c426828ca0a89e754479d68c3"
 
@@ -306,7 +310,7 @@
   version "^3.0.0"
   resolved "https://codeload.github.com/purescript-node/purescript-posix-types/tar.gz/cd1f225840755b6da4fe0f4b9083280b1fa1087d"
 
-"@bower_components/purescript-prelude@purescript/purescript-prelude#^3.1.0":
+"@bower_components/purescript-prelude@purescript/purescript-prelude#^3.0.0", "@bower_components/purescript-prelude@purescript/purescript-prelude#^3.1.0":
   version "^3.1.0"
   resolved "https://codeload.github.com/purescript/purescript-prelude/tar.gz/6d411827970302769895877511f51f7a414ecbb3"
 
@@ -458,6 +462,26 @@ postgres-interval@^1.1.0:
   resolved "https://registry.yarnpkg.com/postgres-interval/-/postgres-interval-1.1.1.tgz#acdb0f897b4b1c6e496d9d4e0a853e1c428f06f0"
   dependencies:
     xtend "^4.0.0"
+
+"purescript-node-streams@github:vpeurala/purescript-node-streams.git":
+  version "3.1.0"
+  resolved "github:vpeurala/purescript-node-streams.git#22c1581f32031fd9ab9cacec59ecd7d55aa95c68"
+  dependencies:
+    "@bower_components/purescript-assert" purescript/purescript-assert#^3.0.0
+    "@bower_components/purescript-bifunctors" purescript-contrib/purescript-bifunctors#^3.0.0
+    "@bower_components/purescript-console" purescript/purescript-console#^3.0.0
+    "@bower_components/purescript-control" purescript/purescript-control#^3.0.0
+    "@bower_components/purescript-eff" purescript/purescript-eff#^3.0.0
+    "@bower_components/purescript-either" purescript/purescript-either#^3.0.0
+    "@bower_components/purescript-exceptions" purescript/purescript-exceptions#^3.0.0
+    "@bower_components/purescript-foldable-traversable" purescript/purescript-foldable-traversable#^3.0.0
+    "@bower_components/purescript-invariant" purescript/purescript-invariant#^3.0.0
+    "@bower_components/purescript-maybe" purescript/purescript-maybe#^3.0.0
+    "@bower_components/purescript-monoid" purescript/purescript-monoid#^3.0.0
+    "@bower_components/purescript-newtype" garyb/purescript-newtype#^2.0.0
+    "@bower_components/purescript-node-buffer" purescript/purescript-node-buffer#^3.0.0
+    "@bower_components/purescript-partial" purescript/purescript-partial#^1.2.0
+    "@bower_components/purescript-prelude" purescript/purescript-prelude#^3.0.0
 
 semver@4.3.2:
   version "4.3.2"

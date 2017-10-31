@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "description": "purescript-herigone-server",
   "dependencies": {
-    "pg": "^6.4.1",
     "@bower_components/purescript-aff": "slamdata/purescript-aff#^3.1.0",
     "@bower_components/purescript-argonaut": "purescript-contrib/purescript-argonaut#^3.1.0",
     "@bower_components/purescript-argonaut-codecs": "purescript-contrib/purescript-argonaut-codecs#^3.2.0",
@@ -84,7 +83,9 @@
     "@bower_components/purescript-type-equality": "purescript/purescript-type-equality#^2.1.0",
     "@bower_components/purescript-typelevel-prelude": "purescript/purescript-typelevel-prelude#^2.3.1",
     "@bower_components/purescript-unfoldable": "paf31/purescript-unfoldable#^3.0.0",
-    "@bower_components/purescript-unsafe-coerce": "purescript-contrib/purescript-unsafe-coerce#^3.0.0"
+    "@bower_components/purescript-unsafe-coerce": "purescript-contrib/purescript-unsafe-coerce#^3.0.0",
+    "pg": "^6.4.1",
+    "purescript-node-streams": "github:vpeurala/purescript-node-streams.git"
   },
   "repository": {
     "type": "git",
