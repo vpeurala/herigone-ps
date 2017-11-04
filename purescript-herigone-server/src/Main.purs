@@ -1,14 +1,17 @@
 module Main where
 
-import Node.Encoding (Encoding(UTF8))
-import Node.HTTP as H
-import Node.Stream as S
-import Node.Process (PROCESS)
+import Prelude
 
+import Node.Encoding (Encoding(UTF8))
 import Node.FS.Aff (FS, readTextFile)
+import Node.HTTP as H
+import Node.Process (PROCESS)
+import Node.Stream as S
 
 import Data.Argonaut.Core (stringify)
 import Data.Argonaut.Encode (encodeJson)
+
+import Data.Either (Either, either)
 
 import Database.Postgres as PG
 
@@ -20,9 +23,9 @@ import Control.Monad.Eff.Exception (EXCEPTION, Error)
 
 import Data.Maybe as M
 
-import Prelude (Unit, bind, const, discard, map, pure, show, unit, ($), (<>))
+import Unsafe.Coerce (unsafeCoerce)
 
-import Herigone.DB (querySelectAllAssociations)
+import Herigone.DB (selectAllAssociations)
 import Herigone.Environment (getHttpServerPort)
 
 getListenOptions :: Int -> H.ListenOptions
@@ -42,13 +45,15 @@ respondToGET request response = do
   liftEff $ log "Responding to GET"
   let responseStream = H.responseAsStream response
       url            = H.requestURL request
+  liftEff $ log ("Responding to GET to url " <> url)
   case url of
+    -- TODO: Should be something like /api/v1/associations
     "/associations" -> do
       liftEff $ H.setStatusCode response 200
       liftEff $ H.setStatusMessage response "OK"
       liftEff $ H.setHeader response "Connection" "close"
       liftEff $ H.setHeader response "Transfer-Encoding" "identity"
-      queryResult <- querySelectAllAssociations
+      queryResult <- selectAllAssociations
       _ <- liftEff $ S.writeString responseStream UTF8 (stringify (encodeJson queryResult)) (pure unit)
       liftEff $ S.end responseStream (pure unit)
     "/index.html" -> do
@@ -91,17 +96,18 @@ respond request response = do
     "GET"  -> respondToGET request response
     _      -> respondToUnsupportedMethod request response
 
-handleRespondError :: forall eff. Error -> Eff (console :: CONSOLE | eff) Unit
-handleRespondError err =
-  log ("Error: " <> show err)
+handleError :: forall eff. Error -> Eff eff Unit
+handleError error = unsafeCoerce $ log ("ERROR: " <> show error)
 
-handleRespondSuccess :: forall a eff. a -> Eff (console :: CONSOLE | eff) Unit
-handleRespondSuccess succ =
-  log ("Success!")
+handleSuccess :: forall eff a. a -> Eff eff Unit
+handleSuccess value = pure unit
+
+handleResponse :: forall eff a. Either Error a -> Eff eff Unit
+handleResponse response = either handleError handleSuccess response
 
 createServerFunction :: forall eff. H.Request -> H.Response -> Eff (db :: PG.DB, http :: H.HTTP, console :: CONSOLE, fs :: FS | eff) Unit
 createServerFunction request response =
-  let canceler = runAff handleRespondError handleRespondSuccess (respond request response)
+  let canceler = runAff handleResponse (respond request response)
   in  map (const unit) canceler
 
 asyncMain :: forall aff. Aff (db :: PG.DB, console :: CONSOLE, process :: PROCESS, http :: H.HTTP, fs :: FS | aff) Unit

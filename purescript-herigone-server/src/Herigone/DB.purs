@@ -1,4 +1,4 @@
-module Herigone.DB (querySelectAllAssociations) where
+module Herigone.DB (selectAllAssociations) where
 
 import Prelude
 
@@ -11,13 +11,13 @@ import Database.Postgres as PG
 
 import Herigone.Domain (Association)
 
-querySelectAllAssociations :: forall aff. Aff (db :: PG.DB | aff) (Array Association)
-querySelectAllAssociations = do
+selectAllAssociations :: forall aff. Aff (db :: PG.DB | aff) (Array Association)
+selectAllAssociations = do
   dbClient <- databaseClient
-  PG.query_ selectAllAssociations dbClient
+  PG.query_ querySelectAllAssociations dbClient
 
-selectAllAssociations :: PG.Query Association
-selectAllAssociations = PG.Query "SELECT id, number, word FROM association"
+querySelectAllAssociations :: PG.Query Association
+querySelectAllAssociations = PG.Query "SELECT id, number, word FROM association"
 
 databaseClient :: forall eff. Aff (db :: DB | eff) PG.Client
 databaseClient = do
