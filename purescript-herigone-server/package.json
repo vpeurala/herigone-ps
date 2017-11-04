@@ -20,6 +20,6 @@
     "yarn": "^1.3.2"
   },
   "scripts": {
-    "postinstall": "bower install"
+    "postinstall": "set -ex; bower install; pulp build --to index.js;"
   }
 }

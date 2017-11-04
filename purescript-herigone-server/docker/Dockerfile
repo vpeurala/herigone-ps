@@ -1,15 +1,11 @@
 FROM node:8-alpine
 
+USER root
+
+RUN npm install pg
+
+COPY index.js index.js
+
 USER node
 
-ENV PATH=$PATH:/home/node/.yarn/bin
-
-RUN yarn global add bower purescript pulp
-
-COPY purescript-herigone-server /purescript-herigone-server
-
-WORKDIR /purescript-herigone-server
-
-RUN pulp build
-
-CMD [ "pulp", "run" ]
+CMD ["node", "index.js"]
