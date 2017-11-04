@@ -1,5 +1,11 @@
-.terraform
 *.tfstate
 .DS_Store
 .idea/
+.psc-ide-port
+.psc-package
+.psci_modules
+.pulp-cache
+.terraform
 bower_components
+node_modules
+output

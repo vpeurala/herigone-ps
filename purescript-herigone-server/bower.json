@@ -1,0 +1,32 @@
+{
+  "name": "purescript-herigone-server",
+  "description": "purescript-herigone-server",
+  "authors": [
+    "Ville Peurala <ville.peurala@gmail.com>"
+  ],
+  "moduleType": "node",
+  "license": "MIT",
+  "keywords": [
+    "purescript",
+    "herigone",
+    "nodejs"
+  ],
+  "homepage": "https://github.com/vpeurala/herigone-ps",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "purescript-argonaut": "^3.1.0",
+    "purescript-argonaut-generic": "^1.2.0",
+    "purescript-herigone-common": "../purescript-herigone-common",
+    "purescript-node-fs-aff": "^5.0.0",
+    "purescript-node-http": "^4.1.0",
+    "purescript-node-postgres": "^4.0.0",
+    "purescript-node-process": "^5.0.0"
+  }
+}
