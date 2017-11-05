@@ -2,22 +2,22 @@ module Test.Main (main) where
 
 import Prelude
 
-import Control.Monad.Aff (Aff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.AVar (AVAR)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (CONSOLE, log)
+import Control.Monad.Eff.Unsafe (unsafeCoerceEff)
 
-import Node.Process (PROCESS, setEnv)
+import Node.Process (setEnv)
 
-import Test.Spec (Spec, describe, it)
+import Test.Spec (describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Test.Spec.Reporter.Console (consoleReporter)
-import Test.Spec.Runner (Reporter, RunnerEffects, run)
+import Test.Spec.Runner (PROCESS, run)
 
 import Herigone.Environment (getHttpServerPort)
 
---main :: forall e. Array (Reporter (RunnerEffects e)) -> Spec (RunnerEffects e) Unit -> Eff (RunnerEffects e) Unit
+main :: forall eff. Eff (console :: CONSOLE, avar :: AVAR, process :: PROCESS | eff) Unit
 main = run [consoleReporter] do
   describe "Herigone.Environment PureScript module" do
 
@@ -32,29 +32,35 @@ main = run [consoleReporter] do
     describe "Function getHttpServerPort" do
       it "returns the default port if not set" do
         liftEff turnOnConsoleLogCapturing
-        port <- liftEff getHttpServerPort
+        port <- liftEff unsafeGetHttpServerPort
         port `shouldEqual` 9771
         logs <- liftEff getCapturedConsoleLogs
         liftEff turnOffConsoleLogCapturing
         logs `shouldEqual` ["Environment variable HERIGONE_SERVER_PORT not set. Using the default port of 9771."]
 
       it "returns the default port if env variable HERIGONE_SERVER_PORT cannot be parsed as int" do
-        liftEff $ setEnv "HERIGONE_SERVER_PORT" "foo"
+        liftEff $ unsafeSetEnv "HERIGONE_SERVER_PORT" "foo"
         liftEff turnOnConsoleLogCapturing
-        port <- liftEff getHttpServerPort
+        port <- liftEff unsafeGetHttpServerPort
         port `shouldEqual` 9771
         logs <- liftEff getCapturedConsoleLogs
         liftEff turnOffConsoleLogCapturing
         logs `shouldEqual` ["Environment variable HERIGONE_SERVER_PORT set to a value of \"foo\" which could not be parsed as an integer. Using the default port of 9771."]
 
       it "returns the port set in env variable HERIGONE_SERVER_PORT if it is valid" do
-        liftEff $ setEnv "HERIGONE_SERVER_PORT" "9772"
+        liftEff $ unsafeSetEnv "HERIGONE_SERVER_PORT" "9772"
         liftEff turnOnConsoleLogCapturing
-        port <- liftEff getHttpServerPort
+        port <- liftEff unsafeGetHttpServerPort
         port `shouldEqual` 9772
         logs <- liftEff getCapturedConsoleLogs
         liftEff turnOffConsoleLogCapturing
         logs `shouldEqual` ["Environment variable HERIGONE_SERVER_PORT set to a value of 9772."]
+
+unsafeGetHttpServerPort :: forall eff. Eff eff Int
+unsafeGetHttpServerPort = unsafeCoerceEff getHttpServerPort
+
+unsafeSetEnv :: forall eff. String -> String -> Eff eff Unit
+unsafeSetEnv key value = unsafeCoerceEff $ setEnv key value
 
 foreign import turnOnConsoleLogCapturing :: forall eff. Eff (console :: CONSOLE | eff) Unit
 
