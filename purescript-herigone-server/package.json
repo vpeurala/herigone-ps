@@ -2,10 +2,6 @@
   "name": "purescript-herigone-server",
   "version": "0.0.1",
   "description": "purescript-herigone-server",
-  "dependencies": {
-    "node": "^8.9.0",
-    "pg": "^7.3.0"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vpeurala/herigone-ps.git"
@@ -16,6 +12,10 @@
     "url": "https://github.com/vpeurala/herigone-ps/issues"
   },
   "homepage": "https://github.com/vpeurala/herigone-ps#readme",
+  "dependencies": {
+    "node": "^8.9.0",
+    "pg": "^7.3.0"
+  },
   "engines": {
     "node": "^8.9.0",
     "yarn": "^1.3.2"
