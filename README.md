@@ -31,3 +31,8 @@ Start server:
 
 `$ cd <PROJECT_ROOT>/purescript-herigone-server`  
 `$ pulp run`  
+
+If you want to build the NGINX module, you need to set two environment variables:
+
+`export WWW_HERIGONE_COM_PEM=<secret path to file www_herigone_com.pem>`
+`export WWW_HERIGONE_COM_KEY=<secret path to file www_herigone_com.key>`
