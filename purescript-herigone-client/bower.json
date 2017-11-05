@@ -1,0 +1,27 @@
+{
+  "name": "purescript-herigone-client",
+  "description": "purescript-herigone-client",
+  "main": "",
+  "authors": [
+    "Ville Peurala <ville.peurala@gmail.com>"
+  ],
+  "moduleType": "globals",
+  "license": "MIT",
+  "keywords": [
+    "purescript",
+    "herigone",
+    "browser"
+  ],
+  "homepage": "https://github.com/vpeurala/herigone-ps",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "purescript-affjax": "^5.0.0"
+  }
+}

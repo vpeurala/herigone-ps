@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-npm install
-bower install
-pulp build --optimise --to herigone.js
-cp herigone.js ../purescript-herigone-static/docker/static/
+set -ex;
+PROJECT_ROOT=$(git rev-parse --show-toplevel);
+cd ${PROJECT_ROOT}/purescript-herigone-client;
+yarn install;
+bower install;
+pulp build --optimise --to herigone.js;

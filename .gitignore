@@ -5,6 +5,7 @@
 .psc-package
 .psci_modules
 .pulp-cache
+.purs-repl
 .terraform
 bower_components
 node_modules

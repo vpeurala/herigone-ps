@@ -1,3 +1,2 @@
 #!/usr/bin/env bash
-docker logs --details --follow herigone-ps-server
-
+docker logs --details --follow herigone-ps-server;
