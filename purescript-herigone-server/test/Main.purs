@@ -1,21 +1,23 @@
-module Test.Main where
+module Test.Main (main) where
 
+import Prelude
+
+import Control.Monad.Aff (Aff)
 import Control.Monad.Eff (Eff)
+import Control.Monad.Eff.AVar (AVAR)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 
-import Node.Process (setEnv)
+import Node.Process (PROCESS, setEnv)
 
-import Test.Spec (describe, it)
+import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Test.Spec.Reporter.Console (consoleReporter)
-import Test.Spec.Runner (RunnerEffects, run)
-
-import Prelude (Unit, bind, discard, ($))
+import Test.Spec.Runner (Reporter, RunnerEffects, run)
 
 import Herigone.Environment (getHttpServerPort)
 
-main :: Eff (RunnerEffects ()) Unit
+--main :: forall e. Array (Reporter (RunnerEffects e)) -> Spec (RunnerEffects e) Unit -> Eff (RunnerEffects e) Unit
 main = run [consoleReporter] do
   describe "Herigone.Environment PureScript module" do
 

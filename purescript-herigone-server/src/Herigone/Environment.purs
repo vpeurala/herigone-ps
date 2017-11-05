@@ -1,13 +1,14 @@
 module Herigone.Environment (getHttpServerPort) where
 
-import Data.Int as Int
-import Node.Process (PROCESS, lookupEnv)
+import Prelude
 
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
+
+import Data.Int as Int
 import Data.Maybe as M
 
-import Prelude (bind, discard, pure, show, ($), (<>))
+import Node.Process (PROCESS, lookupEnv)
 
 getHttpServerPort :: forall eff. Eff (process :: PROCESS, console :: CONSOLE | eff) Int
 getHttpServerPort = do
