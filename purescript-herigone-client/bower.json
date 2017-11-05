@@ -1,7 +1,6 @@
 {
   "name": "purescript-herigone-client",
   "description": "purescript-herigone-client",
-  "main": "",
   "authors": [
     "Ville Peurala <ville.peurala@gmail.com>"
   ],
@@ -22,6 +21,7 @@
     "tests"
   ],
   "dependencies": {
-    "purescript-affjax": "^5.0.0"
+    "purescript-affjax": "^5.0.0",
+    "purescript-herigone-common": "../purescript-herigone-common"
   }
 }
