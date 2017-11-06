@@ -1,5 +1,7 @@
 module Herigone.Domain where
 
+import Data.Argonaut.Decode.Class (class DecodeJson)
+import Data.Argonaut.Decode.Generic (gDecodeJson)
 import Data.Argonaut.Encode (class EncodeJson)
 import Data.Argonaut.Encode.Generic (gEncodeJson)
 import Data.Foreign.Class (class Decode)
@@ -27,3 +29,6 @@ instance decodeAssociation :: Decode Association where
 
 instance encodeJsonAssociation :: EncodeJson Association where
   encodeJson = gEncodeJson
+
+instance decodeJsonAssociation :: DecodeJson Association where
+  decodeJson = gDecodeJson
