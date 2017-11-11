@@ -19,8 +19,9 @@ for MODULE in $(ls -d ${PROJECT_ROOT}/purescript-herigone-*);
   rm -f index.js;
 done;
 
+${PROJECT_ROOT}/scripts/docker-stop-all-containers.sh;
 ${PROJECT_ROOT}/scripts/docker-destroy-all-containers.sh;
-${PROJECT_ROOT}/scripts/docker-destroy-all-images.sh;
+${PROJECT_ROOT}/scripts/docker-destroy-custom-images.sh;
 ${PROJECT_ROOT}/scripts/destroy-network.sh || true;
 
 popd;

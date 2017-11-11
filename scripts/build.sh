@@ -5,6 +5,9 @@ pushd .;
 
 ${PROJECT_ROOT}/scripts/create-network.sh || true;
 
+${PROJECT_ROOT}/scripts/docker-stop-all-containers.sh;
+${PROJECT_ROOT}/scripts/docker-destroy-all-containers.sh;
+
 cd ${PROJECT_ROOT}/purescript-herigone-db/docker/;
 ./build.sh;
 ./start.sh;
