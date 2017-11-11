@@ -1,26 +1,19 @@
 module Main where
 
-import Control.Monad.Aff (Aff)
+import Control.Monad.Aff (Aff, Fiber, launchAff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 import Control.Monad.Eff.Class (liftEff)
-import Control.Monad.Eff.Exception (EXCEPTION, throw)
-import Control.Monad.Aff (Fiber, launchAff)
 
 import Data.Argonaut.Core (Json)
-import Data.Argonaut.Decode (class DecodeJson, decodeJson)
 import Data.Argonaut.Decode.Generic (gDecodeJson)
-import Data.Either (Either(..), fromRight)
-import Data.HTTP.Method (Method(..))
+import Data.Either (Either(..))
 
-import Network.HTTP.Affjax (AJAX, affjax, defaultRequest, get)
-import Network.HTTP.Affjax.Response (class Respondable)
+import Network.HTTP.Affjax (AJAX, get)
 import Network.HTTP.ResponseHeader (ResponseHeader)
 import Network.HTTP.StatusCode (StatusCode)
 
-import Partial.Unsafe (unsafePartial)
-
-import Herigone.Domain
+import Herigone.Domain (Association)
 
 import Prelude
 
