@@ -3,6 +3,10 @@ module Main where
 import Prelude
 
 import Node.Encoding (Encoding(UTF8))
+import Node.Express.App (App, AppM, get, listenHttp, setProp)
+import Node.Express.Handler (Handler)
+import Node.Express.Response (sendJson, setStatus)
+import Node.Express.Types (EXPRESS, Event)
 import Node.FS.Aff (FS, readTextFile)
 import Node.HTTP as H
 import Node.Process (PROCESS)
@@ -16,10 +20,12 @@ import Data.Either (Either, either)
 import Database.Postgres as PG
 
 import Control.Monad.Aff (Aff, launchAff, runAff)
+import Control.Monad.Aff.Class (liftAff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 import Control.Monad.Eff.Exception (EXCEPTION, Error)
+import Control.Monad.Eff.Ref (REF, Ref, newRef)
 
 import Data.Maybe as M
 
@@ -28,18 +34,23 @@ import Unsafe.Coerce (unsafeCoerce)
 import Herigone.DB (selectAllAssociations)
 import Herigone.Environment (getHttpServerPort)
 
+{--
 getListenOptions :: Int -> H.ListenOptions
 getListenOptions listeningPort = {
   hostname: "0.0.0.0",
   port: listeningPort,
   backlog: M.Nothing
 }
+--}
 
+{--
 listenCallback :: forall eff. Int -> Eff (console :: CONSOLE, http :: H.HTTP, process :: PROCESS | eff) Unit
 listenCallback port = do
   log ("HTTP server listening on port " <> (show port) <> ".")
   pure unit
+--}
 
+{--
 respondToGET :: forall aff. H.Request -> H.Response -> Aff (db :: PG.DB, http :: H.HTTP, console :: CONSOLE, fs :: FS | aff) Unit
 respondToGET request response = do
   liftEff $ log "Responding to GET"
@@ -78,7 +89,9 @@ respondToGET request response = do
       liftEff $ H.setHeader response "Connection" "close"
       liftEff $ H.setHeader response "Transfer-Encoding" "identity"
       liftEff $ S.end responseStream (pure unit)
+--}
 
+{--
 respondToUnsupportedMethod :: forall aff. H.Request -> H.Response -> Aff (http :: H.HTTP, console :: CONSOLE | aff) Unit
 respondToUnsupportedMethod request response = do
   let responseStream = H.responseAsStream response
@@ -86,7 +99,15 @@ respondToUnsupportedMethod request response = do
   liftEff $ H.setStatusMessage response "Method Not Allowed"
   liftEff $ H.setHeader response "Connection" "close"
   liftEff $ S.end responseStream (pure unit)
+--}
 
+associations :: forall e. Handler (db :: PG.DB | e)
+associations = do
+  queryResult <- liftAff selectAllAssociations
+  setStatus 200
+  sendJson $ encodeJson queryResult
+
+{--
 respond :: forall aff. H.Request -> H.Response -> Aff (db :: PG.DB, http :: H.HTTP, console :: CONSOLE, fs :: FS | aff) Unit
 respond request response = do
   let method = H.requestMethod request
@@ -95,7 +116,23 @@ respond request response = do
   case method of
     "GET"  -> respondToGET request response
     _      -> respondToUnsupportedMethod request response
+--}
 
+app :: forall e. App (db :: PG.DB, http :: H.HTTP, console :: CONSOLE | e)
+app = do
+  setProp "json spaces" 2
+  get "/api/v1/associations" associations
+
+appStartCallback :: forall e. Event -> Eff (process :: PROCESS, console :: CONSOLE | e) Unit
+appStartCallback event = do
+  port <- liftEff getHttpServerPort
+  log ("Express HTTP server listening on port " <> (show port) <> ".")
+
+main = do
+  port <- liftEff getHttpServerPort
+  listenHttp app port appStartCallback
+
+{--
 handleError :: forall eff. Error -> Eff eff Unit
 handleError error = unsafeCoerce $ log ("ERROR: " <> show error)
 
@@ -121,3 +158,4 @@ main :: forall eff. Eff (db :: PG.DB, exception :: EXCEPTION, console :: CONSOLE
 main = do
   canceler <- launchAff asyncMain
   pure unit
+--}

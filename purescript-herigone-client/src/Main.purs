@@ -28,9 +28,10 @@ main :: forall eff. Eff (ajax :: AJAX, console :: CONSOLE | eff) (Fiber (ajax ::
 main = launchAff $ do
   res <- getAssociations
   let either' = decodeAssociationsFromResponse res.response
-  let associations = unsafePartial $ fromRight either'
-  liftEff $ log $ "associations: " <> (show associations)
-  pure unit
+  case either' of
+    (Left err) -> liftEff $ log err
+    (Right associations) -> do
+      liftEff $ log $ "associations: " <> (show associations)
 
 decodeAssociationsFromResponse :: Json -> Either String (Array Association)
 decodeAssociationsFromResponse json = gDecodeJson json
@@ -38,4 +39,4 @@ decodeAssociationsFromResponse json = gDecodeJson json
 getAssociations :: forall eff. Aff (ajax :: AJAX | eff) { status :: StatusCode,
                                                           headers :: Array ResponseHeader,
                                                           response :: Json }
-getAssociations = get "/associations"
+getAssociations = get "/api/v1/associations"
