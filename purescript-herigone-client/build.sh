@@ -4,4 +4,6 @@ PROJECT_ROOT=$(git rev-parse --show-toplevel);
 cd ${PROJECT_ROOT}/purescript-herigone-client;
 yarn install;
 bower install;
-pulp build --optimise --to herigone.js;
+# TODO: Enable --optimise later
+# pulp build --optimise --to herigone.js;
+pulp build --to herigone.js;
