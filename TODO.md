@@ -5,3 +5,4 @@
 * Move the flyway stuff out from under purescript-herigone-server; it might be better to have it as an independent submodule, or as a part of purescript-herigone-db.
 * Add all the basic association data to flyway migrations, you can get it easily from https://github.com/vpeurala/herigone-elm project.
 * Add HSTS.
+* Make client development cycle faster.
