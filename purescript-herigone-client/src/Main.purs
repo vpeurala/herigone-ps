@@ -2,22 +2,24 @@ module Main where
 
 import Prelude
 
-import Control.Monad.Aff (Aff, Fiber, launchAff)
+import Control.Monad.Aff (Aff)
 import Control.Monad.Eff (Eff)
+import Control.Monad.Eff.AVar (AVAR)
 import Control.Monad.Eff.Console (CONSOLE, log)
 import Control.Monad.Eff.Class (liftEff)
+import Control.Monad.Eff.Exception (EXCEPTION)
+import Control.Monad.Eff.Ref (REF)
 
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Generic (gDecodeJson)
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 
+import DOM (DOM)
+
 import Halogen as H
 import Halogen.Aff as HA
 import Halogen.HTML as HH
-import Halogen.HTML.Events as HE
-import Halogen.HTML.Properties as HP
-import Halogen.Query.HalogenM (HalogenM)
 import Halogen.VDom.Driver (runUI)
 
 import Network.HTTP.Affjax (AJAX, get)
@@ -49,8 +51,7 @@ messageDiv =
               , eval: eval
               , receiver: const Nothing }
 
--- main :: forall eff. Eff (ajax :: AJAX, console :: CONSOLE | eff) (Fiber (ajax :: AJAX, console :: CONSOLE | eff) Unit)
--- main :: Eff (HA.HalogenEffects ()) Unit
+main :: forall eff. Eff (avar :: AVAR, ref :: REF, exception :: EXCEPTION, dom :: DOM, ajax :: AJAX, console :: CONSOLE | eff) Unit
 main = HA.runHalogenAff do
   body <- HA.awaitBody
   io <- runUI messageDiv unit body
@@ -62,9 +63,7 @@ main = HA.runHalogenAff do
       io.query $ H.action $ Populate (show associations)
 
 decodeAssociationsFromResponse :: Json -> Either String (Array Association)
-decodeAssociationsFromResponse json = gDecodeJson json
+decodeAssociationsFromResponse = gDecodeJson
 
-getAssociations :: forall eff. Aff (ajax :: AJAX | eff) { status :: StatusCode,
-                                                          headers :: Array ResponseHeader,
-                                                          response :: Json }
+getAssociations :: forall eff. Aff (ajax :: AJAX | eff) { status :: StatusCode, headers :: Array ResponseHeader, response :: Json }
 getAssociations = get "/api/v1/associations"
