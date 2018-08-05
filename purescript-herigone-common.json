@@ -1,0 +1,5 @@
+bower check-new     Checking for new versions of the project dependencies...
+purescript-herigone-common /Users/vpeurala/Projects/My/herigone-ps/purescript-herigone-common
+├── purescript-argonaut not installed
+├── purescript-argonaut-generic not installed
+└── purescript-foreign-generic not installed

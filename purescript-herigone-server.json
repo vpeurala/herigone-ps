@@ -1,0 +1,13 @@
+bower check-new     Checking for new versions of the project dependencies...
+purescript-herigone-server /Users/vpeurala/Projects/My/herigone-ps/purescript-herigone-server
+├── purescript-argonaut not installed
+├── purescript-argonaut-generic not installed
+├── purescript-express not installed
+├── purescript-herigone-common not installed
+├── purescript-node-fs-aff not installed
+├── purescript-node-http not installed
+├── purescript-node-postgres not installed
+├── purescript-node-process not installed
+├── purescript-psci-support not installed
+├── purescript-spec not installed
+└── purescript-unsafe-coerce not installed
