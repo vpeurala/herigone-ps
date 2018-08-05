@@ -1,9 +1,0 @@
-bower check-new     Checking for new versions of the project dependencies...
-purescript-herigone-client /Users/vpeurala/Projects/My/herigone-ps/purescript-herigone-client
-├── purescript-affjax not installed
-├── purescript-argonaut not installed
-├── purescript-argonaut-codecs not installed
-├── purescript-argonaut-generic not installed
-├── purescript-foreign-generic not installed
-├── purescript-halogen not installed
-└── purescript-herigone-common not installed
